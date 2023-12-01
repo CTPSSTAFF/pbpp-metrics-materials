@@ -11,3 +11,5 @@ The contents of this repository:
 * sample-data folder - contains data returned by RITIS when querying the list of TMCs above for data on June 15, 2022
   * brmpo_npmrds_15June2022-all-vehicles.csv - CSV file from querying for data for all vehicles
   * brmpo_npmrds_15June2022_trucks.csv - CSV file returned from querying for data for trucks only
+* speed-limits folder
+  * tmcs_with_speed_limit_from_cmp.csv - CSV file of {TMC, speed_limit} pairs for TMCs that were included in the last CMP
