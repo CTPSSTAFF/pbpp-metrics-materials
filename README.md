@@ -13,3 +13,5 @@ The contents of this repository:
   * brmpo_npmrds_15June2022_trucks.csv - CSV file returned from querying for data for trucks only
 * speed-limits folder
   * tmcs_with_speed_limit_from_cmp.csv - CSV file of {TMC, speed_limit} pairs for TMCs that were included in the last CMP
+  * tmcs_with_speed_limit_from_cmp_no_quotes.csv - the above list of TMCs, comma-delimited without quotes
+  * tmcs_with_speed_limit_from_cmp_with_quotes.csv - the above list of TMCs, comma-delimited with quotes
