@@ -32,7 +32,7 @@ In order to calculate this metric, for each TMC included in the analysis, we wil
 1. travel time data
 2. the 'posted speed limit'
 
-Item \(1\) can be obtained directly from RITIS. Item \(2\2) is a bit more of a challenge.  
+Item \(1\) can be obtained directly from RITIS. Item \(2\) is a bit more of a challenge.  
 Even though MassDOT maintains posted speed limit data \(and 'speed regulation'\) data in the Road Inventory,
 this data is stored in 'event tables' which are effectively overlayed on the underlying MassDOT route system.
 The challenge here is that the relevant event tables do not segment the underlying route system in the same
@@ -47,12 +47,15 @@ correction, particulary for TMCs that were not on express highways. For all the 
 CMP network, we will use the speed limit from the CMP as we have high confidence in its accuracy.
 
 This leaves the question of how to obtain speed limits for the remaining 1,956 TMCs. The methodology we adopted
-relies upon the work of a consulting firm, 1spatial.com, that was hired by MassDOT to conflate the full INRIX TMC
-network with the MassDOT Road Inventory a year or so ago. This conflation was performed completely programmatically;
-no review and correction by humans was invovled. 
-
+relies upon the work of a consulting firm, [1spatial.com](https://1spatial.com), that was hired by MassDOT to 
+conflate the full INRIX TMCnetwork with the MassDOT Road Inventory a year or so ago. 
+This conflation was performed completely programmatically;no review and correction by humans was invovled. 
 As part of the conflation, 1spatial produced an event table / feature class of TMC IDs and the 
 associated 'Weighted_Average_SR' - the distance-weighted _speed\_regulation_ for the TMC.
+\(__Note:__ 1spatial is
+headquartered in the UK, and its website is apparently hosted there. Due to geo-blocking on the CTPS firewall,
+the 1spatial.com website is not visible from within the CTPS network.\)
+
 
 While _speed\_regulation_ isn't identical to _speed\_limit_, Bob Frey of MassDOT's Office of Transportation
 Planning has advised CTPS that it should be taken as more authoratative than _speed\_limit_. Consequently,
