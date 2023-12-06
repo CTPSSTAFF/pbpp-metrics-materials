@@ -30,10 +30,16 @@ The contents of this repository:
   
 ## Notes on the Contents of the massdot-materials folder
 The __TMC\_not\_null\_weighted\_SR.xlsx__ spreadsheet was shpped to RITIS by Charles Major of MassDOT on September 26, 2023,
-and shared with the author of this document by David Knudsen on November 22, 2023  
+and shared with the author of this document by David Knudsen on November 22, 2023.
+  
 The compressed __TMC-and-speed-events.gdb__ geodatabase was obtained from MassDOT and shared with the author of this document
 by David Knudsen on November 28, 2023.
-  
+
+Comments on the contents of this geodatabase from David Knudsen:
+> You must filter time-wise in the two speed event layers by deleting records where To_Date IS NOT NULL! The two layers are up-to-the-minute current. 
+> The LRSN_Routes layer is a couple months old: what I sent to 1Spatial to run their routines against. Their layer "TMC_PROPOSAL" dates to 2023-10-24, 
+> based on the 2021 TMCs, I think. I don't know much about what all of their fields mean.
+
 ## Notes on Overall Methodology
 The formula for calculating the Peak Hour Excessive Delay metrics, as defined by the FHWA is:
 
