@@ -19,8 +19,22 @@ The contents of this repository:
 * shapefile folder
   * Massachusetts.zip - Compressed NPMRDS TMC shapefile for Massachusetts, downloaded from [RITIS](https://npmrds.ritis.org/analytics/shapefiles)
   * Massachusetts.{dbf, prj, shp, shx} - Files extracted from the above ZIP archive
+* massdot-materials folder
+  * TMC-and-speed-events.gdb.zip - compressed file geodatabase containing:
+    * Conflation_Vector - undocumented / unknown
+	* LRSE_Routes -'routes' event table / feature class, from the MassDOT Road Inventory
+	* LRSE_Speed_Limit - 'speed limit' event table / feature class, from the MassDOT Road Inventory
+	* LRSE_SpeedRegulation - 'speed regulation' event table / feature class, from the MassDOT Road Inventory
+	* TMC_proposal - undocumented / unknown
+  * TMC_not_null_weighted_SR.xlsx - table produced by 1spatial.com mapping TMC \(here: Traffic\_ID\) to distance-weighed speed regulation
   
-## Notes on Methodology
+## Notes on the Contents of the massdot-materials folder
+The __TMC\_not\_null\_weighted\_SR.xlsx__ spreadsheet was shpped to RITIS by Charles Major of MassDOT on September 26, 2023,
+and shared with the author of this document by David Knudsen on November 22, 2023  
+The compressed __TMC-and-speed-events.gdb__ geodatabase was obtained from MassDOT and shared with the author of this document
+by David Knudsen on November 28, 2023.
+  
+## Notes on Overall Methodology
 The formula for calculating the Peak Hour Excessive Delay metrics, as defined by the FHWA is:
 
 > Peak Hour Excessive Delay - ALL PHED during 15-minute increments during peak hours (eventually converted to hours)
@@ -56,10 +70,17 @@ associated 'Weighted_Average_SR' - the distance-weighted _speed\_regulation_ for
 headquartered in the UK, and its website is apparently hosted there. Due to geo-blocking on the CTPS firewall,
 the 1spatial.com website is not visible from within the CTPS network.\)
 
-
 While _speed\_regulation_ isn't identical to _speed\_limit_, Bob Frey of MassDOT's Office of Transportation
 Planning has advised CTPS that it should be taken as more authoratative than _speed\_limit_. Consequently,
-we will be using this value in the calcuations below to come up with a 'speed limit' for the remaining TMCs.
+we will be using the _speed\_regulation_ value in the calcuations below to come up with a 'speed limit' for the remaining TMCs.
 
-## TO BE CONTINUED
+### Methodology for Calculating 'Speed Limit' for TMCs not in the CMP
+This section documents the methodology for calculating the 'speed limit' for TMCs in the NPMRDS within the
+Boston Region MPO area but which are not included in the CMP. In point of fact, the process was run on
+all NPMRDS TMCs in the MPO region, but it was used to obtain the speed limit only for those TMCs that 
+are not part of the CMP. As noted above, the reason for this is that the speed limits for TMCs included in the CMP
+were obtained as a result of a conflation between the TMC network and the Road Inventory that was partially automated,
+but also subject to review and correction by humans. The methodology described here relies upon a purely programmatic 
+conflation \(performed by 1spatial.com\) that was __not__ subjected to review and correction by humans; it is Consequently
+judged less reliable.
 
