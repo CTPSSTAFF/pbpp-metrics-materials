@@ -82,11 +82,43 @@ we will be using the _speed\_regulation_ value in the calcuations below to come 
 
 ### Methodology for Calculating 'Speed Limit' for TMCs not in the CMP
 This section documents the methodology for calculating the 'speed limit' for TMCs in the NPMRDS within the
-Boston Region MPO area but which are not included in the CMP. In point of fact, the process was run on
+Boston Region MPO area but that are __not__ included in the CMP. In point of fact, the process was run on
 all NPMRDS TMCs in the MPO region, but it was used to obtain the speed limit only for those TMCs that 
 are not part of the CMP. As noted above, the reason for this is that the speed limits for TMCs included in the CMP
 were obtained as a result of a conflation between the TMC network and the Road Inventory that was partially automated,
 but also subject to review and correction by humans. The methodology described here relies upon a purely programmatic 
-conflation \(performed by 1spatial.com\) that was __not__ subjected to review and correction by humans; it is Consequently
+conflation \(performed by 1spatial.com\) that was __not__ subjected to review and correction by humans; it is thus
 judged less reliable.
 
+#### Overview
+The general approach taken begins by calcuating the intersection of 'TMC\_Proposal' and 'LRSE\_SpeedRegulation'.
+From the result of the intersection the speed limit that applies along each 'TMC part' is calculated, and finally
+the results from all the 'parts' comprising each TMC is aggregated. There is some hand-waving involved in this
+description; all the nitty-gritty details are described in the 'Detailed Steps' section, below.
+
+TMC\_Proposal is a feature class produced by 1spatial that indicates the 'from-measure' and 'to-measure' of each TMC with respect to
+each MassDOT RouteID with which it is associated.
+LRSE\_SpeedRegulation is a feature class taken from the MassDOT Road Inventory that indicates the 'from-measure' and 'to-measure' 
+along a given MassDOT Route\_ID that a given speed regulation value applies.
+
+The intersection is performed by the ESRI __Overlay\_Route\_Events__ tool. This tool takes event tables, rather than feature classes
+as inputs. So, as a preparatory step each of the feature classes is exported to a 'vanilla' table in a Geodatabase.
+
+#### Detailed Steps
+1. Export the LRSE_SpeedRegulation feature class as a 'vanilla' table that will be used as an event table. The 'route identifier' field
+in this table is __Route\_ID__; the 'from-measure field is __From_\Measure__; the 'to-measure' field is __To\_Measure__.
+2. Export the TMC_Proposal feature class as a 'vanilla' table that will be used as an event table. The 'route identifier field 
+in this table is __PROPOSAL\_LRS\_ROUTE\_ID__; the 'from-measure' field is __Begin\_Measure__; the 'to-measure' field is __End\_Measure__.
+3. Run the __Overlay\_Route\_Events__ tool, saving the output to a table we'll call __TMC\_SpeedReg\_overlay\_ETbl__.
+
+4. Calcuate the 'conflated_length' of each TMC - i.e., the length of the TMC that has been conflated to a MassDOT Route. This is _not_
+necessarily the entire length of the TMC: some portion of any given TMC may have failed to have been conflated to any MassDOT Route.
+The result of this is a table of \{ TMC\_ID, conflated\_length \} pairs we'll call the __tmc\_total\_conflated\_length__ table.
+
+5. Calculate the 'weighted speed limit' for each TMC 'part': for each record in __TMC\_SpeedReg\_overlay\_ETbl__,
+this is given by __speed__ * \(length of the TMC 'part' / total conflated length of the TMC\)
+
+
+
+
+## TO BE CONTINUED
