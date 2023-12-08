@@ -111,14 +111,26 @@ in this table is __Route\_ID__; the 'from-measure field is __From_\Measure__; th
 in this table is __PROPOSAL\_LRS\_ROUTE\_ID__; the 'from-measure' field is __Begin\_Measure__; the 'to-measure' field is __End\_Measure__.
 3. Run the __Overlay\_Route\_Events__ tool, saving the output to a table we'll call __TMC\_SpeedReg\_overlay\_ETbl__.
 
-4. Calcuate the 'conflated_length' of each TMC - i.e., the length of the TMC that has been conflated to a MassDOT Route. This is _not_
+4. Delete records witha NULL or 0-value 'speed' field in  __TMC\_SpeedReg\_overlay\_ETbl__.
+
+5. Calcuate the 'conflated_length' of each TMC - i.e., the length of the TMC that has been conflated to a MassDOT Route. This is _not_
 necessarily the entire length of the TMC: some portion of any given TMC may have failed to have been conflated to any MassDOT Route.
 The result of this is a table of \{ TMC\_ID, conflated\_length \} pairs we'll call the __tmc\_total\_conflated\_length__ table.
 
-5. Calculate the 'weighted speed limit' for each TMC 'part': for each record in __TMC\_SpeedReg\_overlay\_ETbl__,
-this is given by __speed__ * \(length of the TMC 'part' / total conflated length of the TMC\)
+6. Calculate the 'weighted speed limit' for each TMC 'part': for each record in __TMC\_SpeedReg\_overlay\_ETbl__,
+this is given by
+$$ __speed__ * \(length of the TMC 'part' / total conflated length of the TMC\)$$
+
+7. Calculate the $distance / speed$ for each record in __TMC\_SpeedReg\_overlay\_ETbl__:call this __dist\_over\_v; this gives the
+travel time along each TMC part. 
+
+8. Calculate Summary Statistics: sum of __dist__, aggregating by TMC.
+
+9. Calculate Summary Statistics: sum of __dist\_over\_v, aggregating by TMC.
+
+10. Join the results of steps __8__ and __9__ on TMC, and calculate the speed for each TMC using D = R\*T.
+
+11. Round the results to the nearest 5 MPH.
 
 
-
-
-## TO BE CONTINUED
+## TO BE CONTINUED / MORE DETAIL TO BE ADDED
