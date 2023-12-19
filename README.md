@@ -102,7 +102,9 @@ LRSE\_SpeedRegulation is a feature class taken from the MassDOT Road Inventory t
 along a given MassDOT Route\_ID that a given speed regulation value applies.
 
 The intersection is performed by the ESRI __Overlay\_Route\_Events__ tool. This tool takes event tables, rather than feature classes
-as inputs. So, as a preparatory step each of the feature classes is exported to a 'vanilla' table in a Geodatabase.
+as inputs. So, as a preparatory step each of the feature classes is exported to a 'vanilla' table in a Geodatabase. 
+
+The basic approach taken is to use the $D = R * T$ formula to calculate the speed limit for each 
 
 #### Detailed Steps
 1. Export the LRSE_SpeedRegulation feature class as a 'vanilla' table that will be used as an event table. The 'route identifier' field
@@ -133,27 +135,42 @@ the tool invocation are as follows:
   * Keep zero length line events: TRUE
   * Include all fields from input: TRUE
   * Build index: TRUE
+The result of this overlay operation is a table of 'TMC fragments'.
 
-4. Delete records witha NULL or 0-value 'speed' field in  __TMC\_SpeedReg\_overlay\_ETbl__.
+4. Select all records with a NULL or 0-value __Speed__ \(i.e., speed regulation\) field in  __TMC\_SpeedReg\_overlay\_ETbl__, and __delete__ them.
+NOTE: the '__Speed__' field in this table is aliased to '__Speed\_Limit__', making it difficult to spot unless one has turned off 'Show Field Alias'.
 
-5. Calcuate the 'conflated_length' of each TMC - i.e., the length of the TMC that has been conflated to a MassDOT Route. This is _not_
-necessarily the entire length of the TMC: some portion of any given TMC may have failed to have been conflated to a MassDOT Route.
-The result of this is a table of \{ TMC\_ID, conflated\_length \} pairs called the __tmc\_total\_conflated\_length__ table.
+5. The __TMC\_SpeedReg\_overlay\_ETbl__ contains one record for each 'TMC piece'. Add a new field, __dist__ of type __double__ to this table,
+and calculate its value as $abs(Intersect\_To - Intersect\_From)$. (\We need to use the _abs_ function here, because there are cases in which
+the From measure can be Less than the To measure in an event table.\)
 
-6. Calculate the 'weighted speed limit' for each TMC 'part': for each record in __TMC\_SpeedReg\_overlay\_ETbl__,
-this is given by
-$__speed__ * \(length of the TMC 'part' / total conflated length of the TMC\)$
+6. At this point, we have a __speed__ value and a __dist__ \(distance\) value for each 'TMC piece'. Given this, we can calcuate the __travel\_time__
+for each 'TMC piece', using the $D = R * T$ formual. Add a field named __travel\_time__, of type __double__ to __TMC\_SpeedReg\_overlay\_ETbl__.
+Calculate its value as $dist / speed$.
 
-7. Calculate the $distance / speed$ for each record in __TMC\_SpeedReg\_overlay\_ETbl__:call this __dist\_over\_v__; this gives the
-travel time along each TMC part. 
+7. Calcualte the total length of each TMC, using the __Summary Statistics__ tool. The parameters to the tool invocation are:
+* Input table: __TMC\_SpeedReg\_overlay\_ETbl__
+* Output table: __tmc\_dist\_Tbl__
+* Statistics field: __dist__
+* Statistics type: SUM
+* Case field: TMC
+The result of this operation is a table of \{ TMC, FREQUENCY, SUM_distance \} triples. The FREQUENCY column can be ignored for our purposes.
 
-8. Calculate Summary Statistics: sum of __dist__, aggregating by TMC.
+8. Calculate the total travel time along the entire length of the TMC, using the __Summary Statistics__ tool. The parameters to the tool invocation are:
+* * Input table: __TMC\_SpeedReg\_overlay\_ETbl__
+* Output table: __tmc\_travel\_time\_Tbl__
+* Statistics field: __travel\_time__
+* Statistics type: SUM
+* Case field: TMC
+The result of this operation is a table of \{ TMC, FREQUENCY, SUM_travel_time \} triples. Again, the FREQUENCY column can be ignored for our purposes.
 
-9. Calculate Summary Statistics: sum of __dist\_over\_v__, aggregating by TMC.
+9. Now that we have the total length and total travel time for each entire TMC, we can calculate the speed limit for each entire TMC
+using the $R = D / T$ formula. Join __tmc\_dist\_Tbl__ and __tmc\_travel\_time\_Tbl__ on 'TMC', and export the result to __tmc\_speed\_limit\_Tbl__.
 
-10. Join the results of steps __8__ and __9__ on TMC, and calculate the speed for each TMC using $D = R\*T$.
+10. Calculate the 'raw' \(or 'draft'\) speed limit for each TMC:
+* Add a field __speed\_limit\_draft__, field of type __double__, to __tmc\_speed\_limit\_Tbl__. Calculate its value as $SUM_dist / SUM_travel_time$.
 
-11. Round the results to the nearest 5 MPH.
+11. In general, the 'draft' speed limit values may not be integral and even if they are integers may not be multiples of 5 \(as are speed limits\).
+Add a new field, __speed\_limit__ to __tmc\_speed\_limit\_Tbl__, and cacluate it to $5 * round(draft\_speed\_limit * 5)$ to ensure that the 
+resulting calculated speed limit is an integral multiple of 5.
 
-
-## TO BE CONTINUED / MORE DETAIL TO BE ADDED
