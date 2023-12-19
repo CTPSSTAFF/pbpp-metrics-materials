@@ -171,17 +171,21 @@ using the $R = D / T$ formula. Join __tmc\_dist\_Tbl__ and __tmc\_travel\_time\_
 * Add a field __speed\_limit\_draft__, field of type __double__, to __tmc\_speed\_limit\_Tbl__. Calculate its value as $SUM_dist / SUM_travel_time$.
 
 11. In general, the 'draft' speed limit values may not be integral; even if they are integers, they may not be multiples of 5 \(as are speed limits\).
-Add a new field, __speed\_limit__ to __tmc\_speed\_limit\_Tbl__, and cacluate it to $5 * round(draft speed limit * 5)$ to ensure that the 
-resulting calculated speed limit is an integral multiple of 5. This gives a speed limit for all TMCs in Massachusetts, based on MassDOT's 
-Speed_Regulation event table and 1spatial's conflation of the TMC network with the Road Inventory. 
+Add a new field, __speed\_limit__, of type __long__ to __tmc\_speed\_limit\_Tbl__; cacluate its value to to $int(5 * round(draft speed limit / 5))$ 
+to ensure that the  resulting calculated speed limit is an integral multiple of 5. 
+This gives a speed limit for all TMCs in Massachusetts, based on MassDOT's Speed_Regulation event table and 1spatial's conflation of the TMC network with the Road Inventory. 
 
 12. As noted above, as part of our work on the CMP we have speed limit data that has been subject to review and correction by a human for all TMCs
 in the CMP network. When we have a speed limit for a TMC from the CMP, we will use it in favor of the one calculated above. For all other TMCs,
 we will use the speed limit as calculated above. We accomplish this as follows:
 * Join __tmc\_speed\_limit\_Tbl__ to __cmp_2019\_tmc\_speed\_limit__ on the 'TMC' field.
-* Export the result to __non_cmp_tmc_speed_limit_Tbl_
+* Export the result to __non\_cmp\_tmc\_speed\_limit\_Tbl__
 * Select all records for which the __speed\_limit__ from the CMP speed limit table is NULL, and __delete__ them.
 * Prune this table by removing all fields except __TMC__ and the __speed\_limit__ field that came from the joined table,
 and save the result in __non\_cmp\_tmc\_speed\_limit\_Tbl\_pruned__.
 The result is a table of speed limits for TMCs that are _not_ part of the CMP network. Note that this includes TMCs
 that are outside of the Boston Region MPO area.
+
+13. Mrege the __non\_cmp\_tmc\_speed\_limit\_Tbl\_pruned_ table and the __cmp\_2019\_tmc\_speed\_limit__ table,
+producing the __final_tmc_speed_limit_Tbl which includes TMCs outside the Boston MPO region. Removing these TMCs
+from the table is left as an exercise for the reader.
