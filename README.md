@@ -106,29 +106,52 @@ as inputs. So, as a preparatory step each of the feature classes is exported to 
 
 #### Detailed Steps
 1. Export the LRSE_SpeedRegulation feature class as a 'vanilla' table that will be used as an event table. The 'route identifier' field
-in this table is __Route\_ID__; the 'from-measure field is __From_\Measure__; the 'to-measure' field is __To\_Measure__.
+in this table is __Route\_ID__; the 'from-measure field is __From_Measure__; the 'to-measure' field is __To\_Measure__.
+
 2. Export the TMC_Proposal feature class as a 'vanilla' table that will be used as an event table. The 'route identifier field 
 in this table is __PROPOSAL\_LRS\_ROUTE\_ID__; the 'from-measure' field is __Begin\_Measure__; the 'to-measure' field is __End\_Measure__.
-3. Run the __Overlay\_Route\_Events__ tool, saving the output to a table we'll call __TMC\_SpeedReg\_overlay\_ETbl__.
+
+3. Run the __Overlay\_Route\_Events__ tool, saving the output to a table called __TMC\_SpeedReg\_overlay\_ETbl__. The parameters to
+the tool invocation are as follows:
+* Input event table: TMC\_Proposal\_ETbl
+  * Route identifier field: ROPOSAL\_LRS\_ROUTE\_ID
+  * Event Type: LINE
+  * From-measure field: Begin\_Measure
+  * To-measure field: To\_Measure
+* Overlay event table: LRSE|_SpeedRegulation|_ETbl
+  * LRSE_Speed_Regulation_ETbl
+  * Route identifier field: Route\_ID
+  * Event type: LINE
+  * From-measure field: From\_Measure
+  * To-measure field:: To\_Measure
+* Type of overlay: INTERSECT
+* Overlay \(output\) event table: TMC_Speed_Reg_overlay_ETbl
+  * Route identifier field: PROPOSAL\_LRS\_ROUTE\_ID
+  * Event type: LINE
+  * From-Measure Field: Intersect_From
+  * To-Measure Field: Intersect_To
+  * Keep zero length line events: TRUE
+  * Include all fields from input: TRUE
+  * Build index: TRUE
 
 4. Delete records witha NULL or 0-value 'speed' field in  __TMC\_SpeedReg\_overlay\_ETbl__.
 
 5. Calcuate the 'conflated_length' of each TMC - i.e., the length of the TMC that has been conflated to a MassDOT Route. This is _not_
-necessarily the entire length of the TMC: some portion of any given TMC may have failed to have been conflated to any MassDOT Route.
-The result of this is a table of \{ TMC\_ID, conflated\_length \} pairs we'll call the __tmc\_total\_conflated\_length__ table.
+necessarily the entire length of the TMC: some portion of any given TMC may have failed to have been conflated to a MassDOT Route.
+The result of this is a table of \{ TMC\_ID, conflated\_length \} pairs called the __tmc\_total\_conflated\_length__ table.
 
 6. Calculate the 'weighted speed limit' for each TMC 'part': for each record in __TMC\_SpeedReg\_overlay\_ETbl__,
 this is given by
-$$ __speed__ * \(length of the TMC 'part' / total conflated length of the TMC\)$$
+$__speed__ * \(length of the TMC 'part' / total conflated length of the TMC\)$
 
-7. Calculate the $distance / speed$ for each record in __TMC\_SpeedReg\_overlay\_ETbl__:call this __dist\_over\_v; this gives the
+7. Calculate the $distance / speed$ for each record in __TMC\_SpeedReg\_overlay\_ETbl__:call this __dist\_over\_v__; this gives the
 travel time along each TMC part. 
 
 8. Calculate Summary Statistics: sum of __dist__, aggregating by TMC.
 
-9. Calculate Summary Statistics: sum of __dist\_over\_v, aggregating by TMC.
+9. Calculate Summary Statistics: sum of __dist\_over\_v__, aggregating by TMC.
 
-10. Join the results of steps __8__ and __9__ on TMC, and calculate the speed for each TMC using D = R\*T.
+10. Join the results of steps __8__ and __9__ on TMC, and calculate the speed for each TMC using $D = R\*T$.
 
 11. Round the results to the nearest 5 MPH.
 
