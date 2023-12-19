@@ -141,7 +141,7 @@ The result of this overlay operation is a table of 'TMC fragments'.
 NOTE: the '__Speed__' field in this table is aliased to '__Speed\_Limit__', making it difficult to spot unless one has turned off 'Show Field Alias'.
 
 5. The __TMC\_SpeedReg\_overlay\_ETbl__ contains one record for each 'TMC piece'. Add a new field, __dist__ of type __double__ to this table,
-and calculate its value as $abs(Intersect_To - Intersect\From)$. (\We need to use the _abs_ function here, because there are cases in which
+and calculate its value as $abs(Intersect To - Intersect From)$. \(We need to use the _abs_ function here, because there are cases in which
 the From measure can be Less than the To measure in an event table.\)
 
 6. At this point, we have a __speed__ value and a __dist__ \(distance\) value for each 'TMC piece'. Given this, we can calcuate the __travel\_time__
@@ -170,7 +170,7 @@ using the $R = D / T$ formula. Join __tmc\_dist\_Tbl__ and __tmc\_travel\_time\_
 10. Calculate a 'draft' speed limit for each TMC:
 * Add a field __speed\_limit\_draft__, field of type __double__, to __tmc\_speed\_limit\_Tbl__. Calculate its value as $SUM_dist / SUM_travel_time$.
 
-11. In general, the 'draft' speed limit values may not be integral and even if they are integers may not be multiples of 5 \(as are speed limits\).
-Add a new field, __speed\_limit__ to __tmc\_speed\_limit\_Tbl__, and cacluate it to $5 * round(draft_speed_limit * 5)$ to ensure that the 
+11. In general, the 'draft' speed limit values may not be integral; even if they are integers, they may not be multiples of 5 \(as are speed limits\).
+Add a new field, __speed\_limit__ to __tmc\_speed\_limit\_Tbl__, and cacluate it to $5 * round(draft speed limit * 5)$ to ensure that the 
 resulting calculated speed limit is an integral multiple of 5.
 
