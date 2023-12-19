@@ -186,6 +186,6 @@ and save the result in __non\_cmp\_tmc\_speed\_limit\_Tbl\_pruned__.
 The result is a table of speed limits for TMCs that are _not_ part of the CMP network. Note that this includes TMCs
 that are outside of the Boston Region MPO area.
 
-13. Mrege the __non\_cmp\_tmc\_speed\_limit\_Tbl\_pruned_ table and the __cmp\_2019\_tmc\_speed\_limit__ table,
-producing the __final_tmc_speed_limit_Tbl which includes TMCs outside the Boston MPO region. Removing these TMCs
-from the table is left as an exercise for the reader.
+13. Mrege the __non\_cmp\_tmc\_speed\_limit\_Tbl\_pruned__ table and the __cmp\_2019\_tmc\_speed\_limit__ table,
+producing the __final_tmc\_speed\_limit\_Tbl__. Note that this tableincludes TMCs outside the Boston MPO region. 
+Removing these TMCs from the table is left as an exercise for the reader.
