@@ -78,11 +78,12 @@ the 1spatial.com website is not visible from within the CTPS network.\)
 
 While _speed\_regulation_ isn't identical to _speed\_limit_, Bob Frey of MassDOT's Office of Transportation
 Planning has advised CTPS that it should be taken as more authoratative than _speed\_limit_. Consequently,
-we will be using the _speed\_regulation_ value in the calcuations below to come up with a 'speed limit' for the remaining TMCs.
+we will first attempt to use the _speed\_regulation_ value to come up with a 'speed limit' for the remaining TMCs.
 
-### Methodology for Calculating 'Speed Limit' for TMCs not in the CMP
+### Attempt 1 - Harvest Data from the Speed\_Regulation Event Table 
 This section documents the methodology for calculating the 'speed limit' for TMCs in the NPMRDS within the
-Boston Region MPO area but that are __not__ included in the CMP. In point of fact, the process was run on
+Boston Region MPO area but that are __not__ included in the CMP __using data in the MassDOT Speed\_Regulation Event Table.
+In point of fact, the process was run on
 all NPMRDS TMCs in the MPO region, but it was used to obtain the speed limit only for those TMCs that 
 are not part of the CMP. As noted above, the reason for this is that the speed limits for TMCs included in the CMP
 were obtained as a result of a conflation between the TMC network and the Road Inventory that was partially automated,
@@ -90,7 +91,7 @@ but also subject to review and correction by humans. The methodology described h
 conflation \(performed by 1spatial.com\) that was __not__ subjected to review and correction by humans; it is thus
 judged less reliable.
 
-#### Overview
+#### Attempt 1 - Overview
 The general approach taken begins by calcuating the intersection of 'TMC\_Proposal' and 'LRSE\_SpeedRegulation'.
 From the result of the intersection the speed limit that applies along each 'TMC part' is calculated, and finally
 the results from all the 'parts' comprising each TMC is aggregated. There is some hand-waving involved in this
@@ -106,7 +107,7 @@ as inputs. So, as a preparatory step each of the feature classes is exported to 
 
 The basic approach taken is to use the $D = R * T$ formula to calculate the speed limit for each TMC.
 
-#### Detailed Steps
+#### Attempt 1 - Detailed Steps
 1. Export the LRSE_SpeedRegulation feature class as a 'vanilla' table that will be used as an event table. The 'route identifier' field
 in this table is __Route\_ID__; the 'from-measure field is __From_Measure__; the 'to-measure' field is __To\_Measure__.
 
@@ -189,4 +190,67 @@ that are outside of the Boston Region MPO area.
 13. Merge the __non\_cmp\_tmc\_speed\_limit\_Tbl\_pruned__ table and the __cmp\_2019\_tmc\_speed\_limit__ table,
 producing the __final\_MA\_tmc\_speed\_limit\_Tbl__. As the name of this file indicates, it includes TMCs 
 throughout the sate, including those ouside the Boston MPO region. 
-Removing these TMCs from the table is left as an exercise for the reader.
+
+When these TMCs were removed from the table, we found that it did __not__ yeild speed limit data for any TMCs for which
+we didn't already have a speed limit from the CMP.
+
+### Attempt 2 - Harvest Data from the Speed\_Limit Event Table
+The approach of harvesting speed limit data from the Speed\_Regulation event table having borne
+no fruit, we turn now to harvesting this data from the Speed\_Limit event table.
+
+The approach of harvesting speed limit data from the Speed\_Limit Event Table has two drawbacks:
+1. Although there are many more events in this event table than in the Speed\_Regulation event table,
+the all of the data in it hasn't been vetted as recently.
+2. The Speed\_Limit Event Table only carries speed limit data on the __primary__ route; this is 
+a challenge when two routes are concurrent which is typically the case for non-limited-access roads.
+For example: Where Route 62 EB and Route 62 WB are concurrent, speed limit data is carried only in
+events on Route 62 EB \(the primary route direction\); speed limit data for the corresponding section
+of Route 62 WB is carried in the __opposing\_speed\_limit__ event on Route 62 EB. This makes processing
+much more complicated.
+
+#### Attempt 2 - Detailed Steps
+Inputs:
+* MassDOT LRSE\_Routes feature class
+* MassDOT Speed\_Limit event feature classs
+* TMC_Events feature class
+
+1. Clean up the __opposing\_speed\_limit__ field in the Speed\_Limit FC: Select all records
+for which opposing\_speed\_limit is NULL, 0, or 99, and set the value of this field to
+the value of the speed\_limit field.
+
+2. Add a __bearing__ field to the Speed\_Limit FC
+
+3. \(Prep for 4.\) Make a spatial selection on the LRSE\_Routes FC: select all features that INTERSECT with the Speed\_Limit FC.
+
+4. Spatially intersect the Speed\_Limit FC and the LRSE\_Routes FC \(after Step 3. has been executed on it\).
+Call the result __X__.
+
+5. Use the 'Locate Features on Routes' tool to locate __X__ on the LRSE\_Routes route system.
+The result is an event table we'll call __ET__.
+
+6. Convert __ET__ into a feature class; call it __FC__.
+
+7. Prune features from __FC__: delete all features from __FC__ for which the input Route_ID doesn't match
+the Route_ID of the feature against it was located.
+
+8. Add and calcuate a __bearing2__ field to __FC__ which takes into account the output geometry.
+
+9. Export __FC__ as a table, called __FC\_ET__, for use as an input to the Step 11.
+
+10. Export the TMC\_Events feature class as a table: __TMC\_Events_ET__.
+
+11. Overlay (\tabular\) __FC\ET__ with __TMC\_Events\_ET, to produce __final\_output\_table__.
+
+12. Add a new field, __computed\_speed\_limit__, of type __long__, to __final\_output\_table__.
+
+13, Calcuate the value of __computed\_speed\_limit__ according to the following pseudo-code snippet:
+```
+if __bearing__ == __bearing2__ then
+	computed_speed_limit = speed_limit
+else
+	computed_speed_limit = opposing_speed_limit
+endif
+```
+Note: Note because of floating-point precision issues, rather than performing a test for 'hard equality'
+it might be better to compute the absolute value of the diference between the two bearings, 
+and consider the two bearings equal if this difference is less than 1 or 2.
