@@ -168,10 +168,10 @@ The result of this operation is a table of \{ TMC, FREQUENCY, SUM_travel_time \}
 using the $R = D / T$ formula. Join __tmc\_dist\_Tbl__ and __tmc\_travel\_time\_Tbl__ on 'TMC', and export the result to __tmc\_speed\_limit\_Tbl__.
 
 10. Calculate a 'draft' speed limit for each TMC:
-* Add a field __speed\_limit\_draft__, field of type __double__, to __tmc\_speed\_limit\_Tbl__. Calculate its value as $SUM_dist / SUM_travel_time$.
+* Add a field __speed\_limit\_draft__, field of type __double__, to __tmc\_speed\_limit\_Tbl__. Calculate its value as $SUM dist / SUM travel time$.
 
 11. In general, the 'draft' speed limit values may not be integral; even if they are integers, they may not be multiples of 5 \(as are speed limits\).
-Add a new field, __speed\_limit__, of type __long__ to __tmc\_speed\_limit\_Tbl__; cacluate its value to to $int(5 * round(`draft_speed_limit` / 5))$ 
+Add a new field, __speed\_limit__, of type __long__ to __tmc\_speed\_limit\_Tbl__; cacluate its value to to $int(5 * round(draft speed_limit / 5))$ 
 to ensure that the  resulting calculated speed limit is an integral multiple of 5. 
 This gives a speed limit for all TMCs in Massachusetts, based on MassDOT's Speed_Regulation event table and 1spatial's conflation of the TMC network with the Road Inventory. 
 
