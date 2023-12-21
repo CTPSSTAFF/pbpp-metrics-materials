@@ -262,10 +262,10 @@ bearing2_deg = math.degrees(bearing2)
 ```
 The calculation continues, as given in the following pseudo-code:
 ```
-	if (int(abs(bearing2 - bearing1)) % 360) > 90 then
+	if (int(abs(bearing2_deg - bearing1_deg)) % 360) > 90 then
 		computed_speed_limit =  opposing_speed_limit
 	else
-		computed_speed_limit= speed_limit
+		computed_speed_limit = speed_limit
 	end_if
 ```
 14. At this point, we will have a speed limit for each 'TMC piece' resulting from the tabular overlay operation \(Step 11\).
