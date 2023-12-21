@@ -218,19 +218,25 @@ Inputs:
 * MassDOT Speed\_Limit event feature classs
 * TMC_Events feature class
 
-1. Clean up the __opposing\_speed\_limit__ field in the Speed\_Limit FC: Select all records
-for which opposing\_speed\_limit is NULL, 0, or 99, and set the value of this field to
-the value of the speed\_limit field.
+1. 'Clean up' the __opposing\_speed\_limit__ field in the Speed\_Limit FC: 
+* Select all records for which opposing\_speed\_limit is NULL, 0, or 99
+* From these, select all records for which _speed\_limit__ is NULL, 0, or 99, and __delete__ them. These records have no speed limit data that 
+can usefully participate in the following calculations.
+* For the remaining records, set the __opposing\_speed\_limit__ field to the value of the __speed\_limit__ field.
 
 2. Add a __bearing1__ field to the Speed\_Limit FC. This is given by the formula:
 $$
 b = atan2(y2 - y1 / x2 - x1)
 $$
 
-3. \(Preparation for Step 4.\) Make a spatial selection on the LRSE\_Routes FC: select all features that INTERSECT with the Speed\_Limit FC.
+3. \(Preparation for Step 4.\) Make a spatial selection on the LRSE\_Routes FC: select all features that CONTAIN the Speed\_Limit FC.
+\(David K. recommends the use of CONTAINS rather than INTERSECTS, as the latter can pick up 'touching' orthogonal routes that 
+have nothing to do with the routes we want in the spatial overlay.\)
 
 4. Spatially intersect the Speed\_Limit FC and the LRSE\_Routes FC \(after Step 3. has been executed on it\).
 Call the result __X__.
+\(Here David K. suggests that some experimentation with the overlay tool may be needed: Intersection is similar to INNER 
+JOIN, Identity to LEFT OUTER JOIN, and Union to FULL OUTER JOIN.\)
 
 5. Use the 'Locate Features on Routes' tool to locate __X__ on the LRSE\_Routes route system.
 The result is an event table we'll call __ET__.
@@ -251,21 +257,24 @@ This field is calculated using the same formula as in Step \(2\).
 
 12. Add a new field, __computed\_speed\_limit__, of type __long__, to __final\_output\_table__.
 
-13, Calculate the value of __computed\_speed\_limit__.
+13. Calculate the value of __computed\_speed\_limit__.
 Whether the value of  __speed\_limit__ or __opposing\_speed\_limit__ is used is determined by
-whether the difference in the absolute value of the 2 'bearings', mod 360, is greater than 90.
-To make this simple, and recognizing that the Python modulus operator operates only on integers,
-we first convert the 2 'bearings' from radians to degrees:
+whether the two bearings 'align'.
+
+Assuming the two bearings are expressed in radiana, the pseudo-code for this is as follows:
 ```
-bearing1_deg = math.degrees(bearing1)
-bearing2_deg = math.degrees(bearing2)
-```
-The calculation continues, as given in the following pseudo-code:
-```
-	if (int(abs(bearing2_deg - bearing1_deg)) % 360) > 90 then
-		computed_speed_limit =  opposing_speed_limit
+	bearing_delta = bearing2 - bearing1
+	
+	if abs(bearing_delta) < PI then
+		normalized_bearing_delta = abs(bearing_delta)
 	else
-		computed_speed_limit = speed_limit
+		normalized_bearing_delta = (2 * PI) - abs(bearing_delta)
+	end_if
+	
+	if normalized_bearing_delta > (PI / 2) then	
+		use opposing_speed_limit
+	else
+		use speed_limit
 	end_if
 ```
 14. At this point, we will have a speed limit for each 'TMC piece' resulting from the tabular overlay operation \(Step 11\).
