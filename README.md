@@ -26,7 +26,9 @@ The contents of this repository:
 	* LRSE_Speed_Limit - 'speed limit' event table / feature class, from the MassDOT Road Inventory
 	* LRSE_SpeedRegulation - 'speed regulation' event table / feature class, from the MassDOT Road Inventory
 	* TMC_proposal - undocumented / unknown
-  * TMC_not_null_weighted_SR.xlsx - table produced by 1spatial.com mapping TMC \(here: Traffic\_ID\) to distance-weighed speed regulation
+    * TMC_not_null_weighted_SR.xlsx - table produced by 1spatial.com mapping TMC \(here: Traffic\_ID\) to distance-weighed speed regulation
+* results - folder to contain final results, table of \{TMC\_ID, speed\_limit\} pairs in CSV format
+    * currently empty
   
 ## Notes on the Contents of the massdot-materials folder
 The __TMC\_not\_null\_weighted\_SR.xlsx__ spreadsheet was shpped to RITIS by Charles Major of MassDOT on September 26, 2023,
@@ -80,7 +82,7 @@ While _speed\_regulation_ isn't identical to _speed\_limit_, Bob Frey of MassDOT
 Planning has advised CTPS that it should be taken as more authoratative than _speed\_limit_. Consequently,
 we will first attempt to use the _speed\_regulation_ value to come up with a 'speed limit' for the remaining TMCs.
 
-### Attempt 1 - Harvest Data from the Speed\_Regulation Event Table 
+### Approach 1 - Harvest Data from the Speed\_Regulation Event Table 
 This section documents the methodology for calculating the 'speed limit' for TMCs in the NPMRDS within the
 Boston Region MPO area but that are __not__ included in the CMP __using data in the MassDOT Speed\_Regulation Event Table.
 In point of fact, the process was run on
@@ -91,7 +93,7 @@ but also subject to review and correction by humans. The methodology described h
 conflation \(performed by 1spatial.com\) that was __not__ subjected to review and correction by humans; it is thus
 judged less reliable.
 
-#### Attempt 1 - Overview
+#### Approach 1 - Overview
 The general approach taken begins by calcuating the intersection of 'TMC\_Proposal' and 'LRSE\_SpeedRegulation'.
 From the result of the intersection the speed limit that applies along each 'TMC part' is calculated, and finally
 the results from all the 'parts' comprising each TMC is aggregated. There is some hand-waving involved in this
@@ -107,7 +109,7 @@ as inputs. So, as a preparatory step each of the feature classes is exported to 
 
 The basic approach taken is to use the $D = R * T$ formula to calculate the speed limit for each TMC.
 
-#### Attempt 1 - Detailed Steps
+#### Approach 1 - Detailed Steps
 1. Export the LRSE_SpeedRegulation feature class as a 'vanilla' table that will be used as an event table. The 'route identifier' field
 in this table is __Route\_ID__; the 'from-measure field is __From_Measure__; the 'to-measure' field is __To\_Measure__.
 
@@ -194,21 +196,23 @@ throughout the sate, including those ouside the Boston MPO region.
 When these TMCs were removed from the table, we found that it did __not__ yeild speed limit data for any TMCs for which
 we didn't already have a speed limit from the CMP.
 
-### Attempt 2 - Harvest Data from the Speed\_Limit Event Table
+### Approach 2 - Harvest Data from the Speed\_Limit Event Table
 The approach of harvesting speed limit data from the Speed\_Regulation event table having borne
 no fruit, we turn now to harvesting this data from the Speed\_Limit event table.
 
-The approach of harvesting speed limit data from the Speed\_Limit Event Table has two drawbacks:
-1. Although there are many more events in this event table than in the Speed\_Regulation event table,
-the all of the data in it hasn't been vetted as recently.
-2. The Speed\_Limit Event Table only carries speed limit data on the __primary__ route; this is 
+Although there are many more events in the Speed\_Limit event table than in the Speed\_Regulation event table,
+the all of the data in it hasn't been vetted recently, and it is regarded as the less authoritative of the two.
+Nonetheless, it is the only alternative available.
+
+Obtaining speed limit data from he Speed\_Limit event table is much more difficult than obtaining it \(if available\)
+from the Speed\_Regulation event table: the Speed\Limit table only carries speed limit data on the __primary__ route; this is 
 a challenge when two routes are concurrent which is typically the case for non-limited-access roads.
 For example: Where Route 62 EB and Route 62 WB are concurrent, speed limit data is carried only in
 events on Route 62 EB \(the primary route direction\); speed limit data for the corresponding section
 of Route 62 WB is carried in the __opposing\_speed\_limit__ event on Route 62 EB. This makes processing
 much more complicated.
 
-#### Attempt 2 - Detailed Steps
+#### Approach 2 - Detailed Steps
 Inputs:
 * MassDOT LRSE\_Routes feature class
 * MassDOT Speed\_Limit event feature classs
@@ -218,9 +222,12 @@ Inputs:
 for which opposing\_speed\_limit is NULL, 0, or 99, and set the value of this field to
 the value of the speed\_limit field.
 
-2. Add a __bearing__ field to the Speed\_Limit FC
+2. Add a __bearing1__ field to the Speed\_Limit FC. This is given by the formula:
+$$
+b = atan2(y2 - y1 / x2 - x1)
+$$
 
-3. \(Prep for 4.\) Make a spatial selection on the LRSE\_Routes FC: select all features that INTERSECT with the Speed\_Limit FC.
+3. \(Preparation for Step 4.\) Make a spatial selection on the LRSE\_Routes FC: select all features that INTERSECT with the Speed\_Limit FC.
 
 4. Spatially intersect the Speed\_Limit FC and the LRSE\_Routes FC \(after Step 3. has been executed on it\).
 Call the result __X__.
@@ -231,26 +238,41 @@ The result is an event table we'll call __ET__.
 6. Convert __ET__ into a feature class; call it __FC__.
 
 7. Prune features from __FC__: delete all features from __FC__ for which the input Route_ID doesn't match
-the Route_ID of the feature against it was located.
+the Route_ID of the feature against which it was located.
 
-8. Add and calcuate a __bearing2__ field to __FC__ which takes into account the output geometry.
+8. Add and calcuate a __bearing2__ field to __FC__ which takes into account the _output_ geometry.
+This field is calculated using the same formula as in Step \(2\).
 
 9. Export __FC__ as a table, called __FC\_ET__, for use as an input to the Step 11.
 
-10. Export the TMC\_Events feature class as a table: __TMC\_Events_ET__.
+10. Export the TMC\_Events feature class as a table: __TMC\_Events\_ET__.
 
 11. Overlay (\tabular\) __FC\ET__ with __TMC\_Events\_ET, to produce __final\_output\_table__.
 
 12. Add a new field, __computed\_speed\_limit__, of type __long__, to __final\_output\_table__.
 
-13, Calcuate the value of __computed\_speed\_limit__ according to the following pseudo-code snippet:
+13, Calcuate the value of __computed\_speed\_limit__.
+Whether the value of  __speed\_limit__ or __opposing\_speed\_limit__ is used is determined by
+whether the difference in the absolute value of the 2 'bearings', mod 360, is greater than 90.
+To make this simple, and recognizing that the Python modulus operator operates only on integers,
+we first convert the 2 'bearings' from radians to degrees:
 ```
-if __bearing__ == __bearing2__ then
-	computed_speed_limit = speed_limit
-else
-	computed_speed_limit = opposing_speed_limit
-endif
+bearing1_deg = math.degrees(bearing1)
+bearing2_deg = math.degrees(bearing2)
 ```
-Note: Note because of floating-point precision issues, rather than performing a test for 'hard equality'
-it might be better to compute the absolute value of the diference between the two bearings, 
-and consider the two bearings equal if this difference is less than 1 or 2.
+The calculation continues, as given in the following pseudo-code:
+```
+	if (int(abs(bearing2 - bearing1)) % 360) > 90 then
+		computed_speed_limit =  opposing_speed_limit
+	else
+		computed_speed_limit= speed_limit
+	end_if
+```
+14. At this point, we will have a speed limit for each 'TMC piece' resulting from the tabular overlay operation \(Step 11\).
+We then proceed to calcuate a speed limit for each _entire_ TMC using the method described in Approach #1; in summary:
+  1. Calcluate a __dist__ for each 'TMC piece"
+  2. Calcuate a __travel\_time__ for each 'TMC piece'
+  3. Calcuate a total distance for each entire TMC
+  4. Calcuated a total travel time for each entire TMC
+  5. Calcuate a 'draft speed limit' for each entire TMC, using the  $R = D / T$  formula
+  6. Round this value to an integral multiple of 5 MPH
