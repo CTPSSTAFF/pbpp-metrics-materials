@@ -251,7 +251,7 @@ This field is calculated using the same formula as in Step \(2\).
 
 12. Add a new field, __computed\_speed\_limit__, of type __long__, to __final\_output\_table__.
 
-13, Calcuate the value of __computed\_speed\_limit__.
+13, Calculate the value of __computed\_speed\_limit__.
 Whether the value of  __speed\_limit__ or __opposing\_speed\_limit__ is used is determined by
 whether the difference in the absolute value of the 2 'bearings', mod 360, is greater than 90.
 To make this simple, and recognizing that the Python modulus operator operates only on integers,
