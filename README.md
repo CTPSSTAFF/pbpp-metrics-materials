@@ -218,13 +218,15 @@ Inputs:
 * MassDOT Speed\_Limit event feature classs
 * TMC_Events feature class
 
-1. 'Clean up' the Speed\_Limit FC: 
-* Select all records for which __opposing\_speed\_limit__ is NULL, 0, or 99.
-* From these, select all records for which _speed\_limit__ is NULL, 0, or 99, and __delete__ them. These records have no speed limit data that 
+1. 'Clean up' the Speed\_Limit FC. The approach here is to populate the __Op\_Dir\_SL__ \opposing direction speed limit\)
+with the value of the __Speed\_Lim__ \(primary direction speed limit\) field, whenever __Op\_Dir\_SL__ contains no
+useful information. This is the case when its value is NULL, 0, or 99. 
+* Select all records for which __Op\_Dir\_SL__ is NULL, 0, or 99.
+* From these, select all records for which __Speed\_Lim__ is NULL, 0, or 99, and __delete__ them. These records have no speed limit data that 
 can usefully participate in the following calculations.
-* For the remaining records, set the __opposing\_speed\_limit__ field to the value of the __speed\_limit__ field.
-* Select all records for which the __opposing\_speed\_limit__ field is _still_ NULL, 0, or 99, and __delete them__. \(These records
-had NULL, 0, or 99 values in their __speed\_limit__ field to begin with.\)
+* For the remaining records, set the __Op\_Dir\_SL__ field to the value of the __Speed\_Lim__  field.
+* Select all records for which the __Op\_Dir\_SL__ field is _still_ NULL, 0, or 99, and __delete them__. \(These records
+had NULL, 0, or 99 values in their __Speed\_Lim__ field to begin with.\)
 * Delete all records from the Speed\_Limit FC which have a shape\_length of 0.
 
 2. Add a __bearing1__ field to the Speed\_Limit FC. This is given by the formula:
