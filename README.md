@@ -218,11 +218,14 @@ Inputs:
 * MassDOT Speed\_Limit event feature classs
 * TMC_Events feature class
 
-1. 'Clean up' the __opposing\_speed\_limit__ field in the Speed\_Limit FC: 
-* Select all records for which opposing\_speed\_limit is NULL, 0, or 99
+1. 'Clean up' the Speed\_Limit FC: 
+* Select all records for which __opposing\_speed\_limit__ is NULL, 0, or 99.
 * From these, select all records for which _speed\_limit__ is NULL, 0, or 99, and __delete__ them. These records have no speed limit data that 
 can usefully participate in the following calculations.
 * For the remaining records, set the __opposing\_speed\_limit__ field to the value of the __speed\_limit__ field.
+* Select all records for which the __opposing\_speed\_limit__ field is _still_ NULL, 0, or 99, and __delete them__. \(These records
+had NULL, 0, or 99 values in their __speed\_limit__ field to begin with.\)
+* Delete all records from the Speed\_Limit FC which have a shape\_length of 0.
 
 2. Add a __bearing1__ field to the Speed\_Limit FC. This is given by the formula:
 $$
