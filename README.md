@@ -239,34 +239,34 @@ $$
 have nothing to do with the routes we want in the spatial overlay.\) Save the selected features as the __LRS\_Routes\_selected__ FC.
 
 4. Spatially intersect the Speed\_Limit FC and the LRS\_Routes\_selected FC \(after Step 3. has been executed on it\).
-Call the result __X__.
+Call the result __intersect\_FC__.
 \(Here David K. suggests that some experimentation with the overlay tool may be needed: Intersection is similar to INNER 
 JOIN, Identity to LEFT OUTER JOIN, and Union to FULL OUTER JOIN.\)
 
-5. Use the 'Locate Features on Routes' tool to locate __X__ on the LRS\_Routes\_selected route system.
-The result is an event table we'll call __ET__.
+5. Use the 'Locate Features on Routes' tool to locate __intersect\_FC__ on the __LRS\_Routes\_selected__ route system feature class.
+The result is an event table we'll call __located\_features\_ET__.
 
-6. Convert __ET__ into a feature class; call it __FC__.
+6. Convert __located\_features\_ET__ into a feature class; call it __located\_features\_FC__.
 
-7. Prune features from __FC__: delete all features from __FC__ for which the input Route_ID doesn't match
-the Route_ID of the feature against which it was located.
+7. Prune features from __located\_features\_FC__: delete all features from __located\_features\_FC__ for which the input Route_ID
+doesn't match the Route_ID of the feature against which it was located.
 
-8. Add and calcuate a __bearing2__ field to __FC__ which takes into account the _output_ geometry.
+8. Add and calcuate a __bearing2__ field to __located\_features\_FC__ which takes into account the _output_ geometry.
 This field is calculated using the same formula as in Step \(2\).
 
-9. Export __FC__ as a table, called __FC\_ET__, for use as an input to the Step 11.
+9. Export __located\_features\_FC__  as a table, called __located\_features\_FC\_ET__, for use as an input to the Step 11.
 
 10. Export the TMC\_Events feature class as a table: __TMC\_Events\_ET__.
 
-11. Overlay (\tabular\) __FC\ET__ with __TMC\_Events\_ET, to produce __final\_output\_table__.
+11. Overlay (\tabular\) __located\_features\_FC\_ET__ with __TMC\_Events\_ET__, to produce __overlay\_output\_table__.
 
-12. Add a new field, __computed\_speed\_limit__, of type __long__, to __final\_output\_table__.
+12. Add a new field, __computed\_speed\_limit__, of type __long__, to __overlay\_output\_table__.
 
 13. Calculate the value of __computed\_speed\_limit__.
 Whether the value of  __speed\_limit__ or __opposing\_speed\_limit__ is used is determined by
 whether the two bearings 'align'.
 
-Assuming the two bearings are expressed in radiana, the pseudo-code for this is as follows:
+Assuming the two bearings are expressed in radians, the pseudo-code for this is as follows:
 ```
 	bearing_delta = bearing2 - bearing1
 	
