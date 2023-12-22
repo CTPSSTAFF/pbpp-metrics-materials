@@ -235,15 +235,15 @@ b = atan2(y2 - y1 / x2 - x1)
 $$
 
 3. \(Preparation for Step 4.\) Make a spatial selection on the LRS\_Routes FC: select all features that CONTAIN the Speed\_Limit FC.
-\(David K. recommends the use of CONTAINS rather than INTERSECTS, as the latter can pick up 'touching' orthogonal routes that 
-have nothing to do with the routes we want in the spatial overlay.\)
+\(David K. recommends using the CONTAINs selection criterion rather than INTERSECTs, as the latter can pick up 'touching' orthogonal routes that 
+have nothing to do with the routes we want in the spatial overlay.\) Save the selected features as the __LRS\_Routes\_selected__ FC.
 
-4. Spatially intersect the Speed\_Limit FC and the LRS\_Routes FC \(after Step 3. has been executed on it\).
+4. Spatially intersect the Speed\_Limit FC and the LRS\_Routes\_selected FC \(after Step 3. has been executed on it\).
 Call the result __X__.
 \(Here David K. suggests that some experimentation with the overlay tool may be needed: Intersection is similar to INNER 
 JOIN, Identity to LEFT OUTER JOIN, and Union to FULL OUTER JOIN.\)
 
-5. Use the 'Locate Features on Routes' tool to locate __X__ on the LRS\_Routes route system.
+5. Use the 'Locate Features on Routes' tool to locate __X__ on the LRS\_Routes\_selected route system.
 The result is an event table we'll call __ET__.
 
 6. Convert __ET__ into a feature class; call it __FC__.
