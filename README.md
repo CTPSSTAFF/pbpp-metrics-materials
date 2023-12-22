@@ -22,7 +22,7 @@ The contents of this repository:
 * massdot-materials folder
   * TMC-and-speed-events.gdb.zip - compressed file geodatabase containing:
     * Conflation_Vector - undocumented / unknown
-	* LRSE_Routes -'routes' event table / feature class, from the MassDOT Road Inventory
+	* LRS_Routes -'routes' event table / feature class, from the MassDOT Road Inventory
 	* LRSE_Speed_Limit - 'speed limit' event table / feature class, from the MassDOT Road Inventory
 	* LRSE_SpeedRegulation - 'speed regulation' event table / feature class, from the MassDOT Road Inventory
 	* TMC_proposal - undocumented / unknown
@@ -123,7 +123,7 @@ the tool invocation are as follows:
   * Event Type: LINE
   * From-measure field: Begin\_Measure
   * To-measure field: To\_Measure
-* Overlay event table: LRSE|_SpeedRegulation|_ETbl
+* Overlay event table: LRSE\_SpeedRegulation\_ETbl
   * LRSE_Speed_Regulation_ETbl
   * Route identifier field: Route\_ID
   * Event type: LINE
@@ -214,7 +214,7 @@ much more complicated.
 
 #### Approach 2 - Detailed Steps
 Inputs:
-* MassDOT LRSE\_Routes feature class
+* MassDOT LRS\_Routes feature class
 * MassDOT Speed\_Limit event feature classs
 * TMC_Events feature class
 
@@ -234,16 +234,16 @@ $$
 b = atan2(y2 - y1 / x2 - x1)
 $$
 
-3. \(Preparation for Step 4.\) Make a spatial selection on the LRSE\_Routes FC: select all features that CONTAIN the Speed\_Limit FC.
+3. \(Preparation for Step 4.\) Make a spatial selection on the LRS\_Routes FC: select all features that CONTAIN the Speed\_Limit FC.
 \(David K. recommends the use of CONTAINS rather than INTERSECTS, as the latter can pick up 'touching' orthogonal routes that 
 have nothing to do with the routes we want in the spatial overlay.\)
 
-4. Spatially intersect the Speed\_Limit FC and the LRSE\_Routes FC \(after Step 3. has been executed on it\).
+4. Spatially intersect the Speed\_Limit FC and the LRS\_Routes FC \(after Step 3. has been executed on it\).
 Call the result __X__.
 \(Here David K. suggests that some experimentation with the overlay tool may be needed: Intersection is similar to INNER 
 JOIN, Identity to LEFT OUTER JOIN, and Union to FULL OUTER JOIN.\)
 
-5. Use the 'Locate Features on Routes' tool to locate __X__ on the LRSE\_Routes route system.
+5. Use the 'Locate Features on Routes' tool to locate __X__ on the LRS\_Routes route system.
 The result is an event table we'll call __ET__.
 
 6. Convert __ET__ into a feature class; call it __FC__.
