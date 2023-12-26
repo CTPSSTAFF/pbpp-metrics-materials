@@ -245,7 +245,7 @@ Save the result in a new feature class called __intersect\_FC__.
 \(Here David K. suggests that some experimentation with the overlay tool may be needed: Intersection is similar to INNER 
 JOIN, Identity to LEFT OUTER JOIN, and Union to FULL OUTER JOIN.\)
 
-5. Use the 'Locate Features Along Routes' tool to locate __intersect\_FC__ on the __LRS\_Routes\_selected__ route system feature class.
+5. Use the __Locate Features Along Routes__ tool to locate __intersect\_FC__ on the __LRS\_Routes\_selected__ route system feature class.
 The result is an event table we'll call __located\_features\_ET__. Parameters to the tool invocation:
 * Input Features: intersect\_FC
 * Input Route Features: LRS\_Routes\_selected 
@@ -259,7 +259,18 @@ The result is an event table we'll call __located\_features\_ET__. Parameters to
   * Include all fields from input: TRUE 
   * Use M Direction Offseting: TRUE \(__check this__\)
 
-6. Convert __located\_features\_ET__ into a feature class; call it __located\_features\_FC__.
+6. Convert __located\_features\_ET__ into a feature class; call it __located\_features\_FC__:
+* Run the __Make Route Event Layer__ tool with the parameters
+  * Input Route Fetures: LRS\_Routes\_selected 
+  * Route Identifier Field: Route\_ID 
+  * Input Event Table: located\_features\_ET 
+  * Event Table Properties:
+    * Route Identifier Field: RID 
+	* Event Type: LINE 
+	* From-Measure Field: FMEAS 
+	* To-Measure Field: TMEAS
+	* Name of Table or View: __located\_features\_View__
+* Save the __located\_features\_View__ \(an in-memory data structure \) as a feature class: __located\_features\_FC__
 
 7. Prune features from __located\_features\_FC__: delete all features from __located\_features\_FC__ for which the input Route_ID
 doesn't match the Route_ID of the feature against which it was located.
