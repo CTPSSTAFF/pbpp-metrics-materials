@@ -245,8 +245,19 @@ Save the result in a new feature class called __intersect\_FC__.
 \(Here David K. suggests that some experimentation with the overlay tool may be needed: Intersection is similar to INNER 
 JOIN, Identity to LEFT OUTER JOIN, and Union to FULL OUTER JOIN.\)
 
-5. Use the 'Locate Features on Routes' tool to locate __intersect\_FC__ on the __LRS\_Routes\_selected__ route system feature class.
-The result is an event table we'll call __located\_features\_ET__.
+5. Use the 'Locate Features Along Routes' tool to locate __intersect\_FC__ on the __LRS\_Routes\_selected__ route system feature class.
+The result is an event table we'll call __located\_features\_ET__. Parameters to the tool invocation:
+* Input Features: intersect\_FC
+* Input Route Features: LRS\_Routes\_selected 
+* Route Identifier Field: Route\_ID 
+* Output Event Table: located\_features\_ET 
+* Output Event Table Properties:
+  * Route Identifier Field: RID
+  * Event Type: LINE 
+  * From-Measure Field: FMEAS
+  * To-Measure Field: TMEAS
+  * Include all fields from input: TRUE 
+  * Use M Direction Offseting: TRUE \(__check this__\)
 
 6. Convert __located\_features\_ET__ into a feature class; call it __located\_features\_FC__.
 
