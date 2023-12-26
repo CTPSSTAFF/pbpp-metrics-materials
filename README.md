@@ -214,11 +214,11 @@ much more complicated.
 
 #### Approach 2 - Detailed Steps
 Inputs:
-* MassDOT LRS\_Routes feature class
-* MassDOT Speed\_Limit event feature classs
+* MassDOT __LRS\_Routes__ feature class
+* MassDOT Speed\_Limit \(__LRSE\Speed\_Limit__\)event feature classs
 * TMC_Events feature class
 
-1. 'Clean up' the Speed\_Limit FC. The approach here is to populate the __Op\_Dir\_SL__ \(opposing direction speed limit\)
+1. 'Clean up' the __LRSE\Speed\_Limit__ FC. The approach here is to populate the __Op\_Dir\_SL__ \(opposing direction speed limit\)
 with the value of the __Speed\_Lim__ \(primary direction speed limit\) field, whenever __Op\_Dir\_SL__ contains no
 useful information. This is the case when its value is NULL, 0, or 99. 
 * Select all records for which __Op\_Dir\_SL__ is NULL, 0, or 99.
@@ -228,18 +228,20 @@ can usefully participate in the following calculations.
 * Select all records for which the __Op\_Dir\_SL__ field is _still_ NULL, 0, or 99, and __delete__ them. \(These records
 had NULL, 0, or 99 values in their __Speed\_Lim__ field to begin with.\)
 * Delete all records from the Speed\_Limit FC which have a shape\_length of 0.
+* Save the results of these 'cleanup' steps to a new feature class: __LRSE\__Speed\_Limit\_clean__
 
-2. Add a __bearing1__ field to the Speed\_Limit FC. This is given by the formula:
+2. Add a __bearing1__ field to the __LRSE\_Speed\_Limit\_clean__ FC. This is given by the formula:
 $$
 b = atan2(y2 - y1, x2 - x1)
 $$
 
-3. \(Preparation for Step 4.\) Make a spatial selection on the LRS\_Routes FC: select all features that CONTAIN the Speed\_Limit FC.
+3. \(Preparation for Step 4.\) Make a spatial selection on the __LRS\_Routes__ FC: select all features that CONTAIN 
+the __LRSE\_Speed\_Limit\_clean__ FC.
 \(David K. recommends using the CONTAINs selection criterion rather than INTERSECTs, as the latter can pick up 'touching' orthogonal routes that 
 have nothing to do with the routes we want in the spatial overlay.\) Save the selected features as the __LRS\_Routes\_selected__ FC.
 
-4. Spatially intersect the Speed\_Limit FC and the LRS\_Routes\_selected FC \(after Step 3. has been executed on it\).
-Call the result __intersect\_FC__.
+4. Spatially intersect the __LRSE\_Speed\_Limit\_clean__ FC and the LRS\_Routes\_selected FC \(after Step 3. has been executed on it\).
+Save the result in a new feature class called __intersect\_FC__.
 \(Here David K. suggests that some experimentation with the overlay tool may be needed: Intersection is similar to INNER 
 JOIN, Identity to LEFT OUTER JOIN, and Union to FULL OUTER JOIN.\)
 
