@@ -272,17 +272,18 @@ The result is an event table we'll call __located\_features\_ET__. Parameters to
 	* Name of Table or View: __located\_features\_View__
 * Save the __located\_features\_View__ \(an in-memory data structure \) as a feature class: __located\_features\_FC__
 
-7. Prune features from __located\_features\_FC__: delete all features from __located\_features\_FC__ for which the input Route_ID
-doesn't match the Route_ID of the feature against which it was located.
+7. Prune features from __located\_features\_FC__: select all features from __located\_features\_FC__ for which the input route identifier \(_Route\_ID__\)
+mathes the route identifier \(__RID__\) of the feature against which it was located, and export this to a new feature 
+class: __located\_features\_FC\_pruned__. \(This excludes all features for which _Route\_ID__ doesn't equal __RID__ from the following steps.\)
 
-8. Add and calcuate a __bearing2__ field to __located\_features\_FC__ which takes into account the _output_ geometry.
+8. Add and calcuate a __bearing2__ field to __located\_features\_FC\_pruned__ which takes into account the _output_ geometry.
 This field is calculated using the same formula as in Step \(2\).
 
-9. Export __located\_features\_FC__  as a table, called __located\_features\_FC\_ET__, for use as an input to the Step 11.
+9. Export __located\_features\_FC\_pruned__  as a table, called __located\_features\_FC\_pruned\_ET__, for use as an input to the Step 11.
 
 10. Export the TMC\_Events feature class as a table: __TMC\_Events\_ET__.
 
-11. Perform a tabular overlay of __located\_features\_FC\_ET__ with __TMC\_Events\_ET__, to produce __overlay\_output\_table__.
+11. Perform a tabular overlay of __located\_features\_FC\_pruned\_ET__ with __TMC\_Events\_ET__, to produce __overlay\_output\_table__.
 
 12. Add a new field, __computed\_speed\_limit__, of type __long__, to __overlay\_output\_table__.
 
