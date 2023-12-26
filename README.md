@@ -271,7 +271,7 @@ This field is calculated using the same formula as in Step \(2\).
 
 10. Export the TMC\_Events feature class as a table: __TMC\_Events\_ET__.
 
-11. Overlay (\tabular\) __located\_features\_FC\_ET__ with __TMC\_Events\_ET__, to produce __overlay\_output\_table__.
+11. Perform a tabular overlay of __located\_features\_FC\_ET__ with __TMC\_Events\_ET__, to produce __overlay\_output\_table__.
 
 12. Add a new field, __computed\_speed\_limit__, of type __long__, to __overlay\_output\_table__.
 
