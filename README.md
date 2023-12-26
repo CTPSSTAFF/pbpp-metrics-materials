@@ -272,9 +272,12 @@ The result is an event table we'll call __located\_features\_ET__. Parameters to
 	* Name of Table or View: __located\_features\_View__
 * Save the __located\_features\_View__ \(an in-memory data structure \) as a feature class: __located\_features\_FC__
 
-7. Prune features from __located\_features\_FC__: select all features from __located\_features\_FC__ for which the input route identifier \(__Route\_ID__\)
+7. Prune features from __located\_features\_FC__: 
+* First, select all features from __located\_features\_FC__ for which the input route identifier \(__Route\_ID__\)
 mathes the route identifier \(__RID__\) of the feature against which it was located, and export this to a new feature 
-class: __located\_features\_FC\_pruned__. \(This excludes all features for which _R_oute\_ID__ doesn't equal __RID__ from the following steps.\)
+class: __located\_features\_FC\_pruned__. \(This excludes all features for which __Route\_ID__ doesn't equal __RID__ from the following steps.\)
+* Second, select all features from __located\_features\_FC\_pruned__ whose __Shape\_length__ is 0, and delete them. \(Records with 0-length
+geometry can be artifacts of overlay operations.\)
 
 8. Add and calcuate a __bearing2__ field to __located\_features\_FC\_pruned__ which takes into account the _output_ geometry.
 This field is calculated using the same formula as in Step \(2\).
