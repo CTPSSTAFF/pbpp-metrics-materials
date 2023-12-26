@@ -218,7 +218,7 @@ Inputs:
 * MassDOT Speed\_Limit \(__LRSE\Speed\_Limit__\)event feature classs
 * TMC_Events feature class
 
-1. 'Clean up' the __LRSE\Speed\_Limit__ FC. The approach here is to populate the __Op\_Dir\_SL__ \(opposing direction speed limit\)
+1. 'Clean up' the __LRSE\_Speed\_Limit__ FC. The approach here is to populate the __Op\_Dir\_SL__ \(opposing direction speed limit\)
 with the value of the __Speed\_Lim__ \(primary direction speed limit\) field, whenever __Op\_Dir\_SL__ contains no
 useful information. This is the case when its value is NULL, 0, or 99. 
 * Select all records for which __Op\_Dir\_SL__ is NULL, 0, or 99.
@@ -228,7 +228,7 @@ can usefully participate in the following calculations.
 * Select all records for which the __Op\_Dir\_SL__ field is _still_ NULL, 0, or 99, and __delete__ them. \(These records
 had NULL, 0, or 99 values in their __Speed\_Lim__ field to begin with.\)
 * Delete all records from the Speed\_Limit FC which have a shape\_length of 0.
-* Save the results of these 'cleanup' steps to a new feature class: __LRSE\__Speed\_Limit\_clean__
+* Save the results of these 'cleanup' steps to a new feature class: __LRSE\_Speed\_Limit\_clean__
 
 2. Add a __bearing1__ field to the __LRSE\_Speed\_Limit\_clean__ FC. This is given by the formula:
 $$
@@ -240,7 +240,7 @@ the __LRSE\_Speed\_Limit\_clean__ FC.
 \(David K. recommends using the CONTAINs selection criterion rather than INTERSECTs, as the latter can pick up 'touching' orthogonal routes that 
 have nothing to do with the routes we want in the spatial overlay.\) Save the selected features as the __LRS\_Routes\_selected__ FC.
 
-4. Spatially intersect the __LRSE\_Speed\_Limit\_clean__ FC and the LRS\_Routes\_selected FC \(after Step 3. has been executed on it\).
+4. Spatially intersect the __LRSE\_Speed\_Limit\_clean__ FC and the __LRS\_Routes\_selected FC__ \(after Step 3. has been executed on it\).
 Save the result in a new feature class called __intersect\_FC__.
 \(Here David K. suggests that some experimentation with the overlay tool may be needed: Intersection is similar to INNER 
 JOIN, Identity to LEFT OUTER JOIN, and Union to FULL OUTER JOIN.\)
@@ -259,7 +259,7 @@ The result is an event table we'll call __located\_features\_ET__. Parameters to
   * Include all fields from input: TRUE 
   * Use M Direction Offseting: TRUE \(__check this__\)
 
-6. Convert __located\_features\_ET__ into a feature class; call it __located\_features\_FC__:
+6. Convert __located\_features\_ET__ into a feature class __located\_features\_FC__. Detailed steps:
 * Run the __Make Route Event Layer__ tool with the parameters
   * Input Route Fetures: LRS\_Routes\_selected 
   * Route Identifier Field: Route\_ID 
@@ -272,9 +272,9 @@ The result is an event table we'll call __located\_features\_ET__. Parameters to
 	* Name of Table or View: __located\_features\_View__
 * Save the __located\_features\_View__ \(an in-memory data structure \) as a feature class: __located\_features\_FC__
 
-7. Prune features from __located\_features\_FC__: select all features from __located\_features\_FC__ for which the input route identifier \(_Route\_ID__\)
+7. Prune features from __located\_features\_FC__: select all features from __located\_features\_FC__ for which the input route identifier \(__Route\_ID__\)
 mathes the route identifier \(__RID__\) of the feature against which it was located, and export this to a new feature 
-class: __located\_features\_FC\_pruned__. \(This excludes all features for which _Route\_ID__ doesn't equal __RID__ from the following steps.\)
+class: __located\_features\_FC\_pruned__. \(This excludes all features for which _R_oute\_ID__ doesn't equal __RID__ from the following steps.\)
 
 8. Add and calcuate a __bearing2__ field to __located\_features\_FC\_pruned__ which takes into account the _output_ geometry.
 This field is calculated using the same formula as in Step \(2\).
