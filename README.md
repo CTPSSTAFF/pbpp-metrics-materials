@@ -216,7 +216,7 @@ much more complicated.
 Inputs:
 * MassDOT __LRS\_Routes__ feature class
 * MassDOT Speed\_Limit \(__LRSE\Speed\_Limit__\)event feature classs
-* TMC_Events feature class
+* TMC\_proposal feature class - this is the feature class produced by 1spatial conflating the INRIX TMC network with the MassDOT Road Inventory
 
 1. 'Clean up' the __LRSE\_Speed\_Limit__ FC. The approach here is to populate the __Op\_Dir\_SL__ \(opposing direction speed limit\)
 with the value of the __Speed\_Lim__ \(primary direction speed limit\) field, whenever __Op\_Dir\_SL__ contains no
@@ -284,9 +284,9 @@ This field is calculated using the same formula as in Step \(2\).
 
 9. Export __located\_features\_FC\_pruned__  as a table, called __located\_features\_FC\_pruned\_ET__, for use as an input to the Step 11.
 
-10. Export the TMC\_Events feature class as a table: __TMC\_Events\_ET__.
+10. Export the TMC\_proposal feature class as a table: __TMC\_Proposal\_ETbl__.
 
-11. Perform a tabular overlay of __located\_features\_FC\_pruned\_ET__ with __TMC\_Events\_ET__, to produce __overlay\_output\_table__.
+11. Perform a tabular overlay of __located\_features\_FC\_pruned\_ET__ with __TMC\_Proposal\_ETbl__, to produce __overlay\_output\_table__.
 
 12. Add a new field, __computed\_speed\_limit__, of type __long__, to __overlay\_output\_table__.
 
