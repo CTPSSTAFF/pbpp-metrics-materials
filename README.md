@@ -292,19 +292,18 @@ to produce __overlay\_output\_table__. The parameters to the tool invocation are
   * Event Type: LINE
   * From-measure field: Begin\_Measure
   * To-measure field: To\_Measure
-  
 * Overlay event table: located\_features\_FC\_pruned\_ET
-  * Route identifier field: 
+  * Route identifier field: RID
   * Event type: LINE
-  * From-measure field: 
-  * To-measure field:: 
+  * From-measure field: FMEAS
+  * To-measure field: TMEAS
 * Type of overlay: INTERSECT
 * Overlay \(output\) event table: overlay_output_table
   * Route identifier field: PROPOSAL\_LRS\_ROUTE\_ID
   * Event type: LINE
   * From-Measure Field: Intersect_From
   * To-Measure Field: Intersect_To
-  * Keep zero length line events: TRUE
+  * Keep zero length line events: TRUE  \(__not sure if this is a good idea__\)
   * Include all fields from input: TRUE
   * Build index: TRUE  
 The result of this overlay operation is a table of 'TMC fragments'.
