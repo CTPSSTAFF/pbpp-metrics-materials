@@ -123,8 +123,7 @@ the tool invocation are as follows:
   * Event Type: LINE
   * From-measure field: Begin\_Measure
   * To-measure field: To\_Measure
-* Overlay event table: LRSE\_SpeedRegulation\_ETbl
-  * LRSE_Speed_Regulation_ETbl
+* Overlay event table: LRSE\_Speed\_Regulation\_ETbl
   * Route identifier field: Route\_ID
   * Event type: LINE
   * From-measure field: From\_Measure
@@ -286,7 +285,30 @@ This field is calculated using the same formula as in Step \(2\).
 
 10. Export the TMC\_proposal feature class as a table: __TMC\_Proposal\_ETbl__.
 
-11. Perform a tabular overlay of __located\_features\_FC\_pruned\_ET__ with __TMC\_Proposal\_ETbl__, to produce __overlay\_output\_table__.
+11. Use the __Overlay Route Events__ tool to perform a tabular overlay of __TMC\_Proposal\_ETbl__ with  __located\_features\_FC\_pruned\_ET__, 
+to produce __overlay\_output\_table__. The parameters to the tool invocation are as follows:
+* Input event table: TMC\_Proposal\_ETbl
+  * Route identifier field: ROPOSAL\_LRS\_ROUTE\_ID
+  * Event Type: LINE
+  * From-measure field: Begin\_Measure
+  * To-measure field: To\_Measure
+  
+* Overlay event table: located\_features\_FC\_pruned\_ET
+  * Route identifier field: 
+  * Event type: LINE
+  * From-measure field: 
+  * To-measure field:: 
+* Type of overlay: INTERSECT
+* Overlay \(output\) event table: overlay_output_table
+  * Route identifier field: PROPOSAL\_LRS\_ROUTE\_ID
+  * Event type: LINE
+  * From-Measure Field: Intersect_From
+  * To-Measure Field: Intersect_To
+  * Keep zero length line events: TRUE
+  * Include all fields from input: TRUE
+  * Build index: TRUE  
+The result of this overlay operation is a table of 'TMC fragments'.
+
 
 12. Add a new field, __computed\_speed\_limit__, of type __long__, to __overlay\_output\_table__.
 
