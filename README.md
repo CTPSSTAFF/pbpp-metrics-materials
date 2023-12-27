@@ -229,10 +229,18 @@ had NULL, 0, or 99 values in their __Speed\_Lim__ field to begin with.\)
 * Delete all records from the Speed\_Limit FC which have a shape\_length of 0.
 * Save the results of these 'cleanup' steps to a new feature class: __LRSE\_Speed\_Limit\_clean__
 
-2. Add a __bearing1__ field to the __LRSE\_Speed\_Limit\_clean__ FC. This is given by the formula:
+2. Add a __bearing1__ field to the __LRSE\_Speed\_Limit\_clean__ FC, and calculate its value, which is given by the formula:  
 $$
 b = atan2(y2 - y1, x2 - x1)
 $$
+
+>> Note: Based on empirical evidence, execution of this calculation when performed as a 'Calculate Field' runs __VERY__ slowly.
+>> As long as 5 to 7 hours may be required to complete this calcuation on a feature class containing 30,000 to 35,000 records.
+>> Instead, this calculation should be performed by opening a cursor on the feature class, and executing the calculation
+>> explicitly in a loop that iterates over all rows in the feature class.
+>> __The relevant code will be provided shortly.__  
+>> It is also essential that the SRS of the dataset on which this is performed much _exactly_ match the SRS of the Road Inventory.
+>> __Details to be supplied shortly.__
 
 3. \(Preparation for Step 4.\) Make a spatial selection on the __LRS\_Routes__ FC: select all features that CONTAIN 
 the __LRSE\_Speed\_Limit\_clean__ FC.
@@ -279,7 +287,7 @@ class: __located\_features\_FC\_pruned__. \(This excludes all features for which
 geometry can be artifacts of overlay operations.\)
 
 8. Add and calcuate a __bearing2__ field to __located\_features\_FC\_pruned__ which takes into account the _output_ geometry.
-This field is calculated using the same formula as in Step \(2\).
+This field is calculated using the same formula as in Step \(2\). __Note the caveats about this calculation documented above.__
 
 9. Export __located\_features\_FC\_pruned__  as a table, called __located\_features\_FC\_pruned\_ET__, for use as an input to the Step 11.
 
