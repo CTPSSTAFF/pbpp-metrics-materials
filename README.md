@@ -298,7 +298,7 @@ to produce __overlay\_output\_table__. The parameters to the tool invocation are
   * From-measure field: FMEAS
   * To-measure field: TMEAS
 * Type of overlay: INTERSECT
-* Overlay \(output\) event table: overlay_output_table
+* Overlay \(output\) event table: overlay\_output_\table
   * Route identifier field: PROPOSAL\_LRS\_ROUTE\_ID
   * Event type: LINE
   * From-Measure Field: Intersect_From
@@ -308,11 +308,14 @@ to produce __overlay\_output\_table__. The parameters to the tool invocation are
   * Build index: TRUE  
 The result of this overlay operation is a table of 'TMC fragments'.
 
+12. __Sanity Check__: Select all records in __overlay\_output_\table__ with a __Speed\_Lim__ value that is NULL, 0, or 99, and __delete__ them.
+(\In practice, we have found there to be no records that meet this critierion in __overlay\_output_\table__.\)
+Note: The __Speed\_Lim__ field in this table is aliased to __Speed\_Limit__, which may make it difficult to spot.
 
-12. Add a new field, __computed\_speed\_limit__, of type __long__, to __overlay\_output\_table__.
+13. Add a new field, __computed\_speed\_limit__, of type __long__, to __overlay\_output\_table__.
 
-13. Calculate the value of __computed\_speed\_limit__.
-Whether the value of  __speed\_limit__ or __opposing\_speed\_limit__ is used is determined by
+14. Calculate the value of __computed\_speed\_limit__.
+Whether the value of __Speed\_Lim__ \(speed_limit\) or __Op\Dir\_SL__ \(opposing_speed_limit\) is used is determined by
 whether the two bearings 'align'.
 
 Assuming the two bearings are expressed in radians, the pseudo-code for this is as follows:
@@ -331,7 +334,7 @@ Assuming the two bearings are expressed in radians, the pseudo-code for this is 
 		use speed_limit
 	end_if
 ```
-14. At this point, we will have a speed limit for each 'TMC piece' resulting from the tabular overlay operation \(Step 11\).
+15. At this point, we will have a speed limit for each 'TMC piece' resulting from the tabular overlay operation \(Step 11\).
 We then proceed to calcuate a speed limit for each _entire_ TMC using the method described in Approach #1; in summary:
   1. Calcluate a __dist__ for each 'TMC piece"
   2. Calcuate a __travel\_time__ for each 'TMC piece'
