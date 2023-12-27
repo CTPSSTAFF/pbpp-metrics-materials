@@ -306,10 +306,10 @@ to produce __overlay\_output\_table__. The parameters to the tool invocation are
   * Keep zero length line events: TRUE  \(__not sure if this is a good idea__\)
   * Include all fields from input: TRUE
   * Build index: TRUE  
+  
 The result of this overlay operation is a table of 'TMC fragments'.
 
 12. __Sanity Check__: Select all records in __overlay\_output_\table__ with a __Speed\_Lim__ value that is NULL, 0, or 99, and __delete__ them.
-(\In practice, we have found there to be no records that meet this critierion in __overlay\_output_\table__.\)
 Note: The __Speed\_Lim__ field in this table is aliased to __Speed\_Limit__, which may make it difficult to spot.
 
 13. Add a new field, __computed\_speed\_limit__, of type __long__, to __overlay\_output\_table__.
