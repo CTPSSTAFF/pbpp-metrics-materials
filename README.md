@@ -337,9 +337,9 @@ Given that the two bearings are expressed in degrees, the pseudo-code for this i
 	end_if
 	
 	if normalized_bearing_delta > 90 then	
-		use opposing_speed_limit
+		computed_speed_limit = Op_Dir_SL
 	else
-		use speed_limit
+		computed_speed_limit  = Speed_Lim
 	end_if
 ```
 15. At this point, we will have a speed limit for each 'TMC piece' resulting from the tabular overlay operation \(Step 11\).
