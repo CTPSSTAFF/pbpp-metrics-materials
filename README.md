@@ -389,7 +389,7 @@ using the $R = D / T$ formula. Preparatory step: join __tmc\_dist\_Tbl__ and __t
 
 21. Round the 'draft speed limit' to an integral multiple of 5 MPH. In general, the 'draft' speed limit values may not be integral, 
 and even if integral, the values may not be multiples of 5 \(as are speed limits\).
-Add a new field, __speed\_limit__, of type __long__ to __tmc\_speed\_limit\_Tbl__; cacluate its value to to $int(5 * round(draft speed limit / 5))$ 
+Add a new field, __speed\_limit\_final__, of type __long__ to __tmc\_speed\_limit\_Tbl__; calculate its value to to $int(5 * round(draft speed limit / 5))$ 
 to ensure that the  resulting calculated speed limit is an integral multiple of 5. 
 This gives a speed limit for all TMCs in Massachusetts for which:
 * 1spatail successfully conflated the TMC to one or more MassDOT routes, and
