@@ -287,7 +287,7 @@ geometry can be artifacts of overlay operations.\)
 this takes into account the _output_ geometry.
 This field is calculated using the same method as in Step \(2\):
 * Calculate the bearing of the __located\_features\_FC\_pruned__ FC using the __Add Geometry Attributes__ tool.
-* Rename this field to __locd\_feats\_pruned\_FC\_bearing__ using the __Alter Field__ tool.
+* Rename this field to __locd\_feats\_FC_pruned\_bearing__ using the __Alter Field__ tool.
 
 9. Export __located\_features\_FC\_pruned__  as a table, called __located\_features\_FC\_pruned\_ET__, for use as an input to the Step 11.
 
@@ -328,7 +328,7 @@ whether the two bearings 'align'.
 
 Given that the two bearings are expressed in degrees, the pseudo-code for this is as follows:
 ```
-	bearing_delta = locd_feats_pruned_FC_bearing - LRSE_spd_lim_bearing
+	bearing_delta = locd_feats_FC_pruned_bearing - LRSE_spd_lim_bearing
 	
 	if abs(bearing_delta) < 180 then
 		normalized_bearing_delta = abs(bearing_delta)
