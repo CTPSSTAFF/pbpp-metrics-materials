@@ -229,18 +229,15 @@ had NULL, 0, or 99 values in their __Speed\_Lim__ field to begin with.\)
 * Delete all records from the Speed\_Limit FC which have a shape\_length of 0.
 * Save the results of these 'cleanup' steps to a new feature class: __LRSE\_Speed\_Limit\_clean__
 
-2. Add a __bearing1__ field to the __LRSE\_Speed\_Limit\_clean__ FC, and calculate its value, which is given by the formula:  
-$$
-b = atan2(y2 - y1, x2 - x1)
-$$
-
->> Note: Based on empirical evidence, execution of this calculation when performed as a 'Calculate Field' runs __VERY__ slowly.
->> As long as 5 to 7 hours may be required to complete this calcuation on a feature class containing 30,000 to 35,000 records.
->> Instead, this calculation should be performed by opening a cursor on the feature class, and executing the calculation
->> explicitly in a loop that iterates over all rows in the feature class.
->> __The relevant code will be provided shortly.__  
->> It is also essential that the SRS of the dataset on which this is performed much _exactly_ match the SRS of the Road Inventory.
->> __Details to be supplied shortly.__
+2. Calculate the bearing of the geometry of each feature in the __LRSE\_Speed\_Limit\_clean__ FC.
+This is most efficiently performed by running the __Add Geometry Attributes__ tool, specifying the __LINE\_BEARING__ parameter.
+This tool alters its input FC, writing the angular bearing \(in __degrees__\) to it in an attribute named __BEARING__.
+The tool offers no options to specify the name of this attribute; it is hard-wired to 'BEARING'.
+In a subsequent processing step \(Step 8\), we will calculate the bearing of the TMC features 'located' against the 
+LRS\_Route route system, we need to rename the BEARING field produced here to something else: __LRSE\_spd\_lim\_bearing__.  
+In summary:
+* Calculate the bearing of the  __LRSE\_Speed\_Limit\_clean__ FC using the __Add Geometry Attributes__ tool.
+* Rename this field to __LRSE\_spd\_lim\_bearing__ using the __Alter Field__ tool.
 
 3. \(Preparation for Step 4.\) Make a spatial selection on the __LRS\_Routes__ FC: select all features that CONTAIN 
 the __LRSE\_Speed\_Limit\_clean__ FC.
@@ -286,8 +283,11 @@ class: __located\_features\_FC\_pruned__. \(This excludes all features for which
 * Second, select all features from __located\_features\_FC\_pruned__ whose __Shape\_length__ is 0, and delete them. \(Records with 0-length
 geometry can be artifacts of overlay operations.\)
 
-8. Add and calcuate a __bearing2__ field to __located\_features\_FC\_pruned__ which takes into account the _output_ geometry.
-This field is calculated using the same formula as in Step \(2\). __Note the caveats about this calculation documented above.__
+8. Calculate the bearing of the geometry of each feature in the __located\_features\_FC\_pruned__ FC;
+this takes into account the _output_ geometry.
+This field is calculated using the same method as in Step \(2\):
+* Calculate the bearing of the __located\_features\_FC\_pruned__ FC using the __Add Geometry Attributes__ tool.
+* Rename this field to __locd\_feats\_pruned\_FC\_bearing__ using the __Alter Field__ tool.
 
 9. Export __located\_features\_FC\_pruned__  as a table, called __located\_features\_FC\_pruned\_ET__, for use as an input to the Step 11.
 
@@ -326,9 +326,9 @@ Note: The __Speed\_Lim__ field in this table is aliased to __Speed\_Limit__, whi
 Whether the value of __Speed\_Lim__ \(speed_limit\) or __Op\Dir\_SL__ \(opposing_speed_limit\) is used is determined by
 whether the two bearings 'align'.
 
-Assuming the two bearings are expressed in radians, the pseudo-code for this is as follows:
+Given that the two bearings are expressed in degrees, the pseudo-code for this is as follows:
 ```
-	bearing_delta = bearing2 - bearing1
+	bearing_delta = locd_feats_pruned_FC_bearing - LRSE_spd_lim_bearing
 	
 	if abs(bearing_delta) < PI then
 		normalized_bearing_delta = abs(bearing_delta)
