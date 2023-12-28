@@ -352,7 +352,7 @@ in summary, these steps are:
   * Calcuate a 'draft speed limit' for each entire TMC, using the  $R = D / T$  formula
   * Round this value to an integral multiple of 5 MPH  
   
-The details follow:
+The details follow:  
 16. Calcluate a __dist__ for each 'TMC piece': The __overlay\_output\_table__  contains one record for each 'TMC piece'.
 Add a new field, __dist__ of type __double__ to this table,
 and calculate its value as $abs(Intersect To - Intersect From)$. \(We need to use the _abs_ function here, because there are cases in which
