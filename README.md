@@ -343,10 +343,53 @@ Given that the two bearings are expressed in degrees, the pseudo-code for this i
 	end_if
 ```
 15. At this point, we will have a speed limit for each 'TMC piece' resulting from the tabular overlay operation \(Step 11\).
-We then proceed to calcuate a speed limit for each _entire_ TMC using the method described in Approach #1; in summary:
-  1. Calcluate a __dist__ for each 'TMC piece"
-  2. Calcuate a __travel\_time__ for each 'TMC piece'
-  3. Calcuate a total distance for each entire TMC
-  4. Calcuated a total travel time for each entire TMC
-  5. Calcuate a 'draft speed limit' for each entire TMC, using the  $R = D / T$  formula
-  6. Round this value to an integral multiple of 5 MPH
+We then proceed to calcuate a speed limit for each _entire_ TMC using the method described  Steps \(5\) throuhg \(11\) in Approach #1; 
+in summary, these steps are:
+  * Calcluate a __dist__ for each 'TMC piece'
+  * Calcuate a __travel\_time__ for each 'TMC piece'
+  * Calcuate a total distance for each entire TMC
+  * Calcuate a total travel time for each entire TMC
+  * Calcuate a 'draft speed limit' for each entire TMC, using the  $R = D / T$  formula
+  * Round this value to an integral multiple of 5 MPH  
+  
+The details follow:
+16. Calcluate a __dist__ for each 'TMC piece': The __overlay\_output\_table__  contains one record for each 'TMC piece'.
+Add a new field, __dist__ of type __double__ to this table,
+and calculate its value as $abs(Intersect To - Intersect From)$. \(We need to use the _abs_ function here, because there are cases in which
+the From measure can be Less than the To measure in an event table.\)
+
+17. Calcuate a __travel\_time__ for each 'TMC piece': At this point, we have a __calculated\_speed\limit__ \(i.e., __speed__\) value
+and a __dist__ \(distance\) value for each 'TMC piece'. Given this, we can calcuate the __travel\_time__
+for each 'TMC piece', using the $D = R * T$ formula. Add a field named __travel\_time__, of type __double__ to __overlay\_output\_table__.
+Calculate its value as $dist / speed$.
+
+18. Calcualte the total length \(distance\) of each TMC, using the __Summary Statistics__ tool. The parameters to the tool invocation are:
+* Input table: overlay\_output\_table
+* Output table: tmc\_dist\_Tbl
+* Statistics field: dist
+* Statistics type: SUM
+* Case field: TMC  
+The result of this operation is a table of \{ TMC, FREQUENCY, SUM_distance \} triples. The FREQUENCY column can be ignored for our purposes.
+
+19. Calculate the total travel time along the entire length of the TMC, using the __Summary Statistics__ tool. The parameters to the tool invocation are:
+* Input table: overlay\_output\_table
+* Output table: tmc\_travel\_time\_Tbl
+* Statistics field: travel\_time
+* Statistics type: SUM
+* Case field: TMC  
+The result of this operation is a table of \{ TMC, FREQUENCY, SUM_travel_time \} triples. Again, the FREQUENCY column can be ignored for our purposes.
+
+20. Now that we have the total length and total travel time for each entire TMC, we can calculate a 'draft speed limit' for each entire TMC
+using the $R = D / T$ formula. Preparatory step: join __tmc\_dist\_Tbl__ and __tmc\_travel\_time\_Tbl__ on 'TMC', and export the result to __tmc\_speed\_limit\_Tbl__.
+
+21. Calcuate a 'draft speed limit' for each entire TMC:
+* Add a field __speed\_limit\_draft__, field of type __double__, to __tmc\_speed\_limit\_Tbl__. 
+* Calculate its value as $SUM dist / SUM travel time$, i.e., using the  $R = D / T$  formula.
+
+21. Round the 'draft speed limit' to an integral multiple of 5 MPH. In general, the 'draft' speed limit values may not be integral, 
+and even if integral, the values may not be multiples of 5 \(as are speed limits\).
+Add a new field, __speed\_limit__, of type __long__ to __tmc\_speed\_limit\_Tbl__; cacluate its value to to $int(5 * round(draft speed limit / 5))$ 
+to ensure that the  resulting calculated speed limit is an integral multiple of 5. 
+This gives a speed limit for all TMCs in Massachusetts for which:
+* 1spatail successfully conflated the TMC to one or more MassDOT routes, and
+* speed limit data was availble in the Speed\_Limit event table in the MassDOT Road Inventory
