@@ -317,26 +317,26 @@ to produce __overlay\_output\_table__. The parameters to the tool invocation are
   
 The result of this overlay operation is a table of 'TMC fragments'.
 
-12. __Sanity Check__: Select all records in __overlay\_output_\table__ with a __Speed\_Lim__ value that is NULL, 0, or 99, and __delete__ them.
+12. __Sanity Check__: Select all records in __overlay\_output\_table__ with a __Speed\_Lim__ value that is NULL, 0, or 99, and __delete__ them.
 Note: The __Speed\_Lim__ field in this table is aliased to __Speed\_Limit__, which may make it difficult to spot.
 
 13. Add a new field, __computed\_speed\_limit__, of type __long__, to __overlay\_output\_table__.
 
 14. Calculate the value of __computed\_speed\_limit__.
-Whether the value of __Speed\_Lim__ \(speed_limit\) or __Op\Dir\_SL__ \(opposing_speed_limit\) is used is determined by
+Whether the value of __Speed\_Lim__ \(speed_limit\) or __Op\_Dir\_SL__ \(opposing_speed_limit\) is used is determined by
 whether the two bearings 'align'.
 
 Given that the two bearings are expressed in degrees, the pseudo-code for this is as follows:
 ```
 	bearing_delta = locd_feats_pruned_FC_bearing - LRSE_spd_lim_bearing
 	
-	if abs(bearing_delta) < PI then
+	if abs(bearing_delta) < 180 then
 		normalized_bearing_delta = abs(bearing_delta)
 	else
-		normalized_bearing_delta = (2 * PI) - abs(bearing_delta)
+		normalized_bearing_delta = 360 - abs(bearing_delta)
 	end_if
 	
-	if normalized_bearing_delta > (PI / 2) then	
+	if normalized_bearing_delta > 90 then	
 		use opposing_speed_limit
 	else
 		use speed_limit
