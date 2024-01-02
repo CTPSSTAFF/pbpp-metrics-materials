@@ -394,3 +394,44 @@ to ensure that the  resulting calculated speed limit is an integral multiple of 
 This gives a speed limit for all TMCs in Massachusetts for which:
 * 1spatail successfully conflated the TMC to one or more MassDOT routes, and
 * speed limit data was availble in the Speed\_Limit event table in the MassDOT Road Inventory
+
+#### Approach 2 - Final Steps
+The final steps entail preparing a shapefile of the NPMRDS TMCs in the Boston MPO region to which are added the following
+attributes:
+* speed limit calculated by 2019 CMP
+* speed limit calcluated from 'Approach 2'
+* a 'final' speed limit to use in calculating roadway performance metrics required for the Performnace-Based Planning and
+Programming dashboard.
+
+The steps are as follows:
+1. Project the 'Massachusetts.shp' shapefile \(the NPMRDS TMC shapefile for Massachusetts\) to EPSG:26986.
+2. Select the features in \(1\) that intersect the Boston Region MPO \(mpodata.mpodata.CTPS\_BRMPO\_BOUNDARY\_POLY\).
+3. Export \(2\) to a new feature class __npmrds\_tmc\_brmpo__.
+4. Add three new attributes to __npmrds\_tmc\_brmpo__, each of type __long__: __cmp\_speed\_limit__, __calc\_speed\_limit__, and 
+__final\__speed\_limit__.
+5. Join __npmrds\_tmc\_brmpo__ to the table of speed limits produced by the 2019 CMP: __cmp\_2019\_cmp_speed\_limit__, on 'tmc',
+keeping all records.
+6. Calculate the value of the __cmp\_speed\_limit__ attribute to that of the _speed\_limit__ column in the __cmp\_2019\_cmp_speed\_limit__ table;
+then remove the join.
+7. Calculate the value of the __calc\_speed\_limit__ attribute to that of the __final\_speed\_limit__ column in the __tmc\_speed\_limit\_Tbl__ table;
+then remove the join.
+8. Populate the __speed\_limit\_final__ attribute. The basic approach is to use the speed limit from the CMP whenever it is available, even if
+a different value was calcuated by Approach #2. The rationale for this is that the speed limits calculated for the CMP were subject to 
+review after first having been calculated by an automated process, whereas those from the Road Inventory were the result of an entirely automated conflation.
+The details:
+* Select all records for which __cmp\_speed\_limit_ IS NOT NULL; set the value of __final\_speed\_limit__ to the value of __cmp\_speed\_limit_ . Then clear the selection.
+* Select all records for which __cmp\_speed\_limit_ IS NULL AND __calc\_speed\_limit_ IS NOT NULL; 
+set the value of __final\_speed\_limit__ to the value of __calc\_speed\_limit_ . Then clear the selection.
+
+Finally, export the attribute table of __npmrds\_tmc\_brmpo__ to a CSV file for use in subsequent analysis and the performance dashboard.
+Drop all columns except _tmc__ and __final\_speed\_limit__.
+
+#### Approach 2 - Summary of Results
+The following table summarizes the source of speed limit data \(if any\) for the 5143 TMCs
+in the Boston Region MPO area:
+| Factor | Number of TMCs |
+| ------------ | ----------- |
+| Total number of TMCs | 5143 |
+| Speed limit from 2019 CMP | 2853 |
+| Speed limit from 2022 Road Inventory using Approach #2 | 1387 |
+| No speed limit | 903 |
