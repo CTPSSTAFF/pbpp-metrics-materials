@@ -27,8 +27,9 @@ The contents of this repository:
 	* LRSE_SpeedRegulation - 'speed regulation' event table / feature class, from the MassDOT Road Inventory
 	* TMC_proposal - undocumented / unknown
     * TMC_not_null_weighted_SR.xlsx - table produced by 1spatial.com mapping TMC \(here: Traffic\_ID\) to distance-weighed speed regulation
-* results - folder to contain final results, table of \{TMC\_ID, speed\_limit\} pairs in CSV format
-    * currently empty
+* results folder
+    * npmrds_tmc_brmpo.csv - final results table, in CSV format
+	* working3.gdb.7z - 7z-compressed file Geodatabase containing intermediate results of running Approach #2, below
   
 ## Notes on the Contents of the massdot-materials folder
 The __TMC\_not\_null\_weighted\_SR.xlsx__ spreadsheet was shpped to RITIS by Charles Major of MassDOT on September 26, 2023,
