@@ -409,7 +409,7 @@ The steps are as follows:
 2. Select the features in \(1\) that intersect the Boston Region MPO \(mpodata.mpodata.CTPS\_BRMPO\_BOUNDARY\_POLY\).
 3. Export \(2\) to a new feature class __npmrds\_tmc\_brmpo__.
 4. Add three new attributes to __npmrds\_tmc\_brmpo__, each of type __long__: __cmp\_speed\_limit__, __calc\_speed\_limit__, and 
-__final\__speed\_limit__.
+__final\_speed\_limit__.
 5. Join __npmrds\_tmc\_brmpo__ to the table of speed limits produced by the 2019 CMP: __cmp\_2019\_cmp_speed\_limit__, on 'tmc',
 keeping all records.
 6. Calculate the value of the __cmp\_speed\_limit__ attribute to that of the _speed\_limit__ column in the __cmp\_2019\_cmp_speed\_limit__ table;
@@ -420,13 +420,13 @@ then remove the join.
 a different value was calcuated by Approach #2. The rationale for this is that the speed limits calculated for the CMP were subject to 
 review after first having been calculated by an automated process, whereas those from the Road Inventory were the result of an entirely automated conflation.
 The details:
-* Select all records for which __cmp\_speed\_limit_ IS NOT NULL; set the value of __final\_speed\_limit__ to the value of __cmp\_speed\_limit_ . Then clear the selection.
-* Select all records for which __cmp\_speed\_limit_ IS NULL AND __calc\_speed\_limit_ IS NOT NULL; 
-set the value of __final\_speed\_limit__ to the value of __calc\_speed\_limit_ . Then clear the selection.
+* Select all records for which __cmp\_speed\_limit__ IS NOT NULL; set the value of __final\_speed\_limit__ to the value of __cmp\_speed\_limit__ . Then clear the selection.
+* Select all records for which __cmp\_speed\_limit__ IS NULL AND __calc\_speed\_limit__ IS NOT NULL; 
+set the value of __final\_speed\_limit__ to the value of __calc\_speed\_limit__. Then clear the selection.
 
 Finally, export the attribute table of __npmrds\_tmc\_brmpo__ to a CSV file for use in subsequent analysis and the performance dashboard.
 Drop all columns except _tmc__ and __final\_speed\_limit__.
-
+_
 #### Approach 2 - Summary of Results
 The following table summarizes the source of speed limit data \(if any\) for the 5143 TMCs
 in the Boston Region MPO area:
