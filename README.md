@@ -215,7 +215,7 @@ much more complicated.
 #### Approach 2 - Detailed Steps
 Inputs:
 * MassDOT __LRS\_Routes__ feature class
-* MassDOT Speed\_Limit \(__LRSE\Speed\_Limit__\)event feature classs
+* MassDOT Speed\_Limit \(__LRSE\_Speed\_Limit__\)event feature classs
 * TMC\_proposal feature class - this is the feature class produced by 1spatial conflating the INRIX TMC network with the MassDOT Road Inventory
 
 1. 'Clean up' the __LRSE\_Speed\_Limit__ FC. The approach here is to populate the __Op\_Dir\_SL__ \(opposing direction speed limit\)
