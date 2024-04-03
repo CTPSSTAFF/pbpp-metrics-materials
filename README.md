@@ -197,42 +197,42 @@ When these TMCs were removed from the table, we found that it did __not__ yeild 
 we didn't already have a speed limit from the CMP.
 
 ### Approach 2 - Harvest Data from the Speed\_Limit Event Table
-The approach of harvesting speed limit data from the Speed\_Regulation event table having borne
-no fruit, we turn now to harvesting this data from the Speed\_Limit event table.
+__The approach of harvesting speed limit data from the Speed\_Regulation event table having borne
+no fruit, we turn now to harvesting this data from the Speed\_Limit event table.__
 
 Although there are many more events in the Speed\_Limit event table than in the Speed\_Regulation event table,
-the all of the data in it hasn't been vetted recently, and it is regarded as the less authoritative of the two.
+all of the data in it hasn't been vetted recently, and it is regarded as the less authoritative of the two.
 Nonetheless, it is the only alternative available.
 
 Obtaining speed limit data from he Speed\_Limit event table is much more difficult than obtaining it \(if available\)
 from the Speed\_Regulation event table: the Speed\Limit table only carries speed limit data on the __primary__ route; this is 
-a challenge when two routes are concurrent which is typically the case for non-limited-access roads.
+a challenge when two routes are _concurrent_ - which is typically the case for non-limited-access roads.
 For example: Where Route 62 EB and Route 62 WB are concurrent, speed limit data is carried only in
-events on Route 62 EB \(the primary route direction\); speed limit data for the corresponding section
+events on Route 62 __EB__ \(the primary route direction\); speed limit data for the corresponding section
 of Route 62 WB is carried in the __opposing\_speed\_limit__ event on Route 62 EB. This makes processing
 much more complicated.
 
 #### Approach 2 - Detailed Steps
 Inputs:
 * MassDOT __LRS\_Routes__ feature class
-* MassDOT Speed\_Limit \(__LRSE\_Speed\_Limit__\)event feature classs
+* MassDOT Speed\_Limit \(__LRSE\_Speed\_Limit__\) event feature class
 * TMC\_proposal feature class - this is the feature class produced by 1spatial conflating the INRIX TMC network with the MassDOT Road Inventory
 
 1. 'Clean up' the __LRSE\_Speed\_Limit__ FC. The approach here is to populate the __Op\_Dir\_SL__ \(opposing direction speed limit\)
 with the value of the __Speed\_Lim__ \(primary direction speed limit\) field, whenever __Op\_Dir\_SL__ contains no
-useful information. This is the case when its value is NULL, 0, or 99. 
+useful information. This is the case when its value is NULL, or 0, or 99. 
 * Select all records for which __Op\_Dir\_SL__ is NULL, 0, or 99.
 * From these, select all records for which __Speed\_Lim__ is NULL, 0, or 99, and __delete__ them. These records have no speed limit data that 
 can usefully participate in the following calculations.
 * For the remaining records, set the __Op\_Dir\_SL__ field to the value of the __Speed\_Lim__  field.
 * Select all records for which the __Op\_Dir\_SL__ field is _still_ NULL, 0, or 99, and __delete__ them. \(These records
 had NULL, 0, or 99 values in their __Speed\_Lim__ field to begin with.\)
-* Delete all records from the Speed\_Limit FC which have a shape\_length of 0.
+* Delete all records from the Speed\_Limit FC which have a __shape\_length__ of 0.
 * Save the results of these 'cleanup' steps to a new feature class: __LRSE\_Speed\_Limit\_clean__
 
-2. Calculate the bearing of the geometry of each feature in the __LRSE\_Speed\_Limit\_clean__ FC.
+2. Calculate the _bearing_ of the geometry of each feature in the __LRSE\_Speed\_Limit\_clean__ FC.
 This is most efficiently performed by running the __Add Geometry Attributes__ tool, specifying the __LINE\_BEARING__ parameter.
-This tool alters its input FC, writing the angular bearing \(in __degrees__\) to it in an attribute named __BEARING__.
+This tool _alters its input FC_, writing the angular bearing \(in __degrees__\) to it in an attribute named __BEARING__.
 The tool offers no options to specify the name of this attribute; it is hard-wired to 'BEARING'.
 In a subsequent processing step \(Step 8\), we will calculate the bearing of the TMC features 'located' against the 
 LRS\_Route route system, we need to rename the BEARING field produced here to something else: __LRSE\_spd\_lim\_bearing__.  
@@ -251,7 +251,7 @@ Save the result in a new feature class called __intersect\_FC__.
 JOIN, Identity to LEFT OUTER JOIN, and Union to FULL OUTER JOIN.\)
 
 5. Use the __Locate Features Along Routes__ tool to locate __intersect\_FC__ on the __LRS\_Routes\_selected__ route system feature class.
-The result is an event table we'll call __located\_features\_ET__. Parameters to the tool invocation:
+The result is an event table we'll call __located\_features\_ET__. The parameters to the tool invocation are:
 * Input Features: intersect\_FC
 * Input Route Features: LRS\_Routes\_selected 
 * Route Identifier Field: Route\_ID 
@@ -265,7 +265,7 @@ The result is an event table we'll call __located\_features\_ET__. Parameters to
   * Use M Direction Offseting: TRUE \(__check this__\)
 
 6. Convert __located\_features\_ET__ into a feature class __located\_features\_FC__. Detailed steps:
-* Run the __Make Route Event Layer__ tool with the parameters
+* Run the __Make Route Event Layer__ tool with the parameters:
   * Input Route Fetures: LRS\_Routes\_selected 
   * Route Identifier Field: Route\_ID 
   * Input Event Table: located\_features\_ET 
@@ -279,7 +279,7 @@ The result is an event table we'll call __located\_features\_ET__. Parameters to
 
 7. Prune features from __located\_features\_FC__: 
 * First, select all features from __located\_features\_FC__ for which the input route identifier \(__Route\_ID__\)
-mathes the route identifier \(__RID__\) of the feature against which it was located, and export this to a new feature 
+matches the route identifier \(__RID__\) of the feature against which it was located, and export this to a new feature 
 class: __located\_features\_FC\_pruned__. \(This excludes all features for which __Route\_ID__ doesn't equal __RID__ from the following steps.\)
 * Second, select all features from __located\_features\_FC\_pruned__ whose __Shape\_length__ is 0, and delete them. \(Records with 0-length
 geometry can be artifacts of overlay operations.\)
@@ -351,7 +351,7 @@ in summary, these steps are:
   * Calcuate a total distance for each entire TMC
   * Calcuate a total travel time for each entire TMC
   * Calcuate a 'draft speed limit' for each entire TMC, using the  $R = D / T$  formula
-  * Round this value to an integral multiple of 5 MPH  
+  * Round this value to an integral multiple of 5 MPH \(speed limits are integral multiples of 5 MPH\)
   
 The details follow:  
 
